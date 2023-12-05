@@ -3,6 +3,7 @@ kind: Pipeline
 metadata:
   labels:
     app: library-shop-pipelines
+    group: rhacademy
   name: library-shop-pipeline
 spec:
   params:
@@ -18,12 +19,6 @@ spec:
     type: string
   - description: image to be build from the code
     name: backend-image
-    type: string
-  - description: URL of the maven repository
-    name: maven-repo
-    type: string
-  - description: URL of the container registry
-    name: registry-url
     type: string
   tasks:
   - name: fetch-source
@@ -93,7 +88,7 @@ spec:
   - name: maven-build
     params:
     - name: MAVEN_IMAGE
-      value: registry.access.redhat.com/ubi9/openjdk-17-runtime:1.17-1
+      value: registry.access.redhat.com/ubi9/openjdk-17:1.17-1
     - name: GOALS
       value:
       - '-DskipTests'

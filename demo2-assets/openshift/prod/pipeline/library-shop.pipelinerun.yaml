@@ -2,7 +2,10 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: library-shop-pipelinerun
+  labels:
+    app: library-shop-pipelines
+    group: rhacademy
+  generateName: library-shop-pr-
 spec:
   serviceAccountName: pipeline
   pipelineRef:
@@ -12,6 +15,7 @@ spec:
     value: library-shop
   - name: git-url
     value: http://git.rhacademy.example.com:5000/alumno/library-shop.git
+    #value: https://github.com/juazugas/rha-quarkus-library-shop.git
   - name: backend-image
     value: image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/library-shop:1.0.0
   workspaces:

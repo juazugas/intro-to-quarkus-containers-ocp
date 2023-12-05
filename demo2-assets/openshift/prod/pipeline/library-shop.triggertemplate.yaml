@@ -2,6 +2,9 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
+  labels:
+    app: library-shop-pipelines
+    group: rhacademy
   name: library-shop
 spec:
   params:
@@ -16,6 +19,9 @@ spec:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
     metadata:
+      labels:
+        app: library-shop-pipelines
+        group: rhacademy
       generateName: pipeline-library-shop-
     spec:
       workspaces:
