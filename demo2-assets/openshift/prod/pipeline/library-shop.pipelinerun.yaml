@@ -1,0 +1,25 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: library-shop-pipelinerun
+spec:
+  serviceAccountName: pipeline
+  pipelineRef:
+    name: library-shop-pipeline
+  params:
+  - name: deployment-name
+    value: library-shop
+  - name: git-url
+    value: http://git.rhacademy.example.com:5000/alumno/library-shop.git
+  - name: backend-image
+    value: image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/library-shop:1.0.0
+  workspaces:
+  - name: shared-workspace
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 500Mi

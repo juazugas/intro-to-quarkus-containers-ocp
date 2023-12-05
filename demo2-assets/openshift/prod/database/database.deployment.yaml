@@ -1,0 +1,136 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    template.openshift.io/expose-database_name: '{.data[''DATABASE_NAME'']}'
+    template.openshift.io/expose-password: '{.data[''DATABASE_PASSWORD'']}'
+    template.openshift.io/expose-username: '{.data[''DATABASE_USER'']}'
+  labels:
+    app.kubernetes.io/part-of: rhacademy
+    app.kubernetes.io/component: database
+    app.kubernetes.io/instance: library-shop-db
+    app.kubernetes.io/name: postgresql
+    app: library-shop
+  name: library-db
+stringData:
+  DATABASE_NAME: library-db
+  DATABASE_PASSWORD: library-pwd
+  DATABASE_USER: library-user
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/component: database
+    app.kubernetes.io/instance: library-shop-db
+    app.kubernetes.io/part-of: rhacademy
+  name: library-db
+spec:
+  ports:
+    - name: tcp-pgsql
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+  selector:
+    app: library-db
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"postgresql:15-el8","namespace":"openshift"},"fieldPath":"spec.template.spec.containers[?(@.name==\"postgresql\")].image"}]'
+  labels:
+    app.kubernetes.io/part-of: rhacademy
+    app.kubernetes.io/component: database
+    app.kubernetes.io/instance: library-shop-db
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/version: "15-el8"
+    app: library-shop-db
+  name: library-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: library-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: library-db
+        app.kubernetes.io/part-of: rhacademy
+        app.kubernetes.io/component: database
+        app.kubernetes.io/instance: library-shop-db
+        app.kubernetes.io/name: postgresql
+    spec:
+      containers:
+        - env:
+            - name: POSTGRESQL_USER
+              valueFrom:
+                secretKeyRef:
+                  key: DATABASE_USER
+                  name: library-db
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: DATABASE_PASSWORD
+                  name: library-db
+            - name: POSTGRESQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: DATABASE_NAME
+                  name: library-db
+          image: image-registry.openshift-image-registry.svc:5000/openshift/postgresql@sha256:289a28c4dd16b418a53ba0e3a38bceaaaee60bc28f7aeae69cacf0c57738b374
+          imagePullPolicy: IfNotPresent
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "while ! /usr/libexec/check-container; do echo Waiting for Database ...; sleep 3 ; done ; cat /tmp/data/init/library-db-ddl.sql | PGPASSWORD=library-pwd psql -U library-user -h localhost -d library-db -f -"]
+          startupProbe:
+            exec:
+              command:
+                - /usr/libexec/check-container
+                - --live
+            initialDelaySeconds: 120
+            timeoutSeconds: 30
+          livenessProbe:
+            exec:
+              command:
+                - /usr/libexec/check-container
+                - --live
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+          name: postgresql
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - /usr/libexec/check-container
+            initialDelaySeconds: 15
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 250m
+              memory: 512Mi
+          securityContext:
+            capabilities: {}
+            privileged: false
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+            - mountPath: /var/lib/pgsql/data
+              name: library-db-data
+            - mountPath: /tmp/data/init
+              name: library-db-init
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      volumes:
+        - emptyDir: {}
+          name: library-db-data
+        - secret:
+            secretName: library-db-data
+          name: library-db-init

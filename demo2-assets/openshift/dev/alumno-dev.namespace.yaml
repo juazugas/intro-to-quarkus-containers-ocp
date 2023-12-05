@@ -1,0 +1,10 @@
+- apiVersion: project.openshift.io/v1
+  kind: Namespace
+  metadata:
+    annotations:
+      openshift.io/description: "Alumno N1 PlayGround Project"
+      openshift.io/display-name: "Alumno N1 PlayGround"
+    labels:
+      app.kubernetes.io/part-of: rhacademy
+      kubernetes.io/metadata.name: alumno-n1--dev
+    name: alumno-n1--dev

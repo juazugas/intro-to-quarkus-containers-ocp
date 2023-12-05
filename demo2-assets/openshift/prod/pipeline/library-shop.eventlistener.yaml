@@ -1,0 +1,9 @@
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: library-shop
+spec:
+  serviceAccountName: pipeline
+  triggers:
+    - triggerRef: library-shop
