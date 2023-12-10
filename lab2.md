@@ -113,8 +113,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     ./mvnw oc:resource oc:apply
     ~~~
 
-    ~~output
-    ...
+    ~~~output
     [INFO] --- oc:1.15.0:apply (default-cli) @ library-shop ---
     [INFO] oc: OpenShift platform detected
     [INFO] oc: Using OpenShift at https://api.crc.testing:6443/ in namespace null with manifest target/classes/META-INF/jkube/openshift.yml
@@ -142,6 +141,8 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     library-shop-5cfffb9db8-phlrx   1/1     Running     0          6m23s
     library-shop-s2i-1-build        0/1     Completed   0          21m
     ~~~
+
+    NOTE: Ctrl+C to exit from the watch
 
 9. Check the application is working correctly
 
