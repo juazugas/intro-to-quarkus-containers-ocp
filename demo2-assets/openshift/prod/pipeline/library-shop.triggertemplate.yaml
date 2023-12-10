@@ -22,7 +22,7 @@ spec:
       labels:
         app: library-shop-pipelines
         group: rhacademy
-      generateName: pipeline-library-shop-
+      generateName: library-shop-trigger-
     spec:
       workspaces:
       - name: shared-workspace

@@ -4,7 +4,7 @@ metadata:
   labels:
     app: library-shop-pipelines
     group: rhacademy
-  name: libray-shop
+  name: library-shop
 spec:
   serviceAccountName: pipeline
   bindings:
