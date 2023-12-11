@@ -1,77 +1,98 @@
 # Development with Containers
 
-In this lab we are going to see how we can use Java with Quarkus to build and run containers in our local system.
+In this lab we are going to see how we can use Java with [Quarkus](https://quarkus.io/) to build and run containers in our local system.
 
 ## Lab 1 - Running our first quarkus application
 
-1. Connect to the Fedora 39 system
-2. Clone the application and change into the created directory
+1. Connect to the Fedora 39 system.
+
+2. Open the `Visual Studio Code` application.
+
+3. On the top menu, click `Terminal` -> `New Terminal`. You will see a new terminal has been opened at the bottom.
+
+4. In this terminal, clone the application and change into the created directory:
 
     ~~~sh
-    git clone https://github.com/juazugas/rha-quarkus-library-shop library-shop
-    cd library-shop
+    git clone https://github.com/juazugas/rha-quarkus-library-shop.git  ~/library-shop
+    cd ~/library-shop/
     ~~~
 
-3. Run the application in dev mode
+5. Open the folder containing the application in Visual Studio Code. In the VSCode Menu click on `File` -> `Open Folder` -> `Carpeta personal` -> `library-shop` -> `Abrir`.
+
+6. Run the application in dev mode from the terminal:
 
     ~~~sh
     ./mvnw compile quarkus:dev
     ~~~
 
-4. Check the required database container was created
+7. Eventually, you will get this in your screen:
 
-    ~~~sh
-    podman ps
+    > **NOTE**: At this point the application is running.
 
-    CONTAINER ID  IMAGE                          COMMAND               CREATED          STATUS          PORTS                   NAMES
-    2c2e8ebd9c05  docker.io/library/postgres:14  postgres -c fsync...  2 seconds ago    Up 2 seconds    0.0.0.0:5432->5432/tcp  bold_mahavira
+    ~~~console
+    2023-12-07 11:51:59,498 INFO  [io.quarkus] (Quarkus Main Thread) library-shop 1.0.0 on JVM (powered by Quarkus 3.6.0) started in 8.267s. Listening on: http://localhost:8080
+    2023-12-07 11:51:59,499 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+    2023-12-07 11:51:59,500 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, hibernate-orm-rest-data-panache, jdbc-postgresql, narayana-jta, resteasy-reactive, resteasy-reactive-jackson, resteasy-reactive-links, smallrye-context-propagation, smallrye-health, smallrye-openapi, swagger-ui, vertx]
     ~~~
 
-5. Access the container and check the database was initialized by the application
+8. The terminal we previously opened is now running our application, we will open a new terminal to run the following commands. On the top menu, click `Terminal` -> `New Terminal`.
+
+9. Check the required database container was created:
 
     ~~~sh
-    podman exec -ti bold_mahavira psql -U quarkus quarkus
+    podman ps | grep postgres
+    ~~~
 
-    psql (14.5 (Debian 14.5-1.pgdg110+1))
-    Type "help" for help.
+    ~~~output
+    467e8b4bbc4d  docker.io/library/postgres:14        postgres -c fsync...  2 minutes ago  Up 2 minutes  0.0.0.0:5432->5432/tcp   inspiring_jemison
+    ~~~
 
-    quarkus=# \dt
-                List of relations
-    Schema |     Name     | Type  |  Owner
+10. Access the container and check the database was initialized by the application:
+
+    ~~~sh
+    POSTGRES_CONTAINER=$(podman ps | grep postgres | awk '{print $1}')
+    podman exec -ti ${POSTGRES_CONTAINER}  psql -U quarkus -d quarkus -c '\dt'
+    ~~~
+
+    ~~~output
+            List of relations
+     Schema |     Name     | Type  |  Owner  
     --------+--------------+-------+---------
-    public | book         | table | quarkus
-    public | book_authors | table | quarkus
-    public | ehlo_message | table | quarkus
+     public | book         | table | quarkus
+     public | book_authors | table | quarkus
+     public | ehlo_message | table | quarkus
     (3 rows)
-
-    quarkus=# \q
     ~~~
 
-6. Query and check the application is running
+11. Query and check the application is running
 
     ~~~sh
     curl -s http://localhost:8080/hello
+    ~~~
 
+    ~~~output
     Hello from RESTEasy Reactive
     ~~~
 
     ~~~sh
     curl -s http://localhost:8080/ehlo
+    ~~~
 
+    ~~~output
     ehlo from version v1 host localhost
     ~~~
 
     ~~~sh
-    curl -s http://localhost:8080/ehlo
+    curl -s http://localhost:8080/ehlo/database
+    ~~~
 
+    ~~~output
     ehlo from PostgreSQL 15.3 on x86_64-redhat-linux-gnu, compiled by gcc (GCC) 8.5.0 20210514 (Red Hat 8.5.0-18), 64-bit
     ~~~
 
 ## Lab 2 - Developing the application
 
-1. Open the Visual Code and open the Folder containing the application project
-
-2. Open the GreetingResource.java (src/main/java) and change the return message to "Hello Red Hat Academy"
+1. Open the GreetingResource.java (src/main/java), change the return message to `Hello Red Hat Academy` and save the changes.
 
     ~~~java
     public String hello() {
@@ -79,15 +100,17 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     }
     ~~~
 
-3. Open a terminal and check the application reload the changes
+2. In the terminal, check that the application has the new changes(It's been rebuilt and restarted):
 
     ~~~sh
     curl -s http://localhost:8080/hello
+    ~~~
 
+    ~~~output
     Hello Red Hat Academy
     ~~~
 
-4. Fix the test GreetingsResourceTest.java (src/test/java) and launch the test suite
+3. Fix the test GreetingsResourceTest.java (src/test/java), save the changes and launch the test suite.
 
     ~~~java
     @Test
@@ -101,7 +124,9 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
     ~~~sh
     ./mvnw test
+    ~~~
 
+    ~~~output
     ...
     [INFO]
     [INFO] Results:
@@ -113,7 +138,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     [INFO] ------------------------------------------------------------------------
     ~~~
 
-5. Generate the application binary and check the distributables
+4. Generate the application binary and check the distributables:
 
     ~~~sh
     ./mvnw package
@@ -121,12 +146,13 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
     Check the target directory and verify the generated jar and the dependencies
 
-
-6. (optional) Validate the application code
+5. (optional) Validate the application code
 
     ~~~sh
     ./mvnw validate
+    ~~~
 
+    ~~~output
     ...
     [INFO]
     [INFO] --- checkstyle:3.3.1:check (default) @ library-shop ---
@@ -136,91 +162,107 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     [INFO] ------------------------------------------------------------------------
     ~~~
 
-5. Execute the application using the generated binaries
+6. Pause the execution of the application in dev mode. Go to the first terminal you opened and press the key `q` to exit.
+
+7. Execute the application using the generated binaries and podman for running the database:
 
     ~~~sh
+    podman run -d --name pg-library-shop -e POSTGRES_USER=quarkus -e POSTGRES_PASSWORD=quarkus -e POSTGRESQL_DATABASE=quarkus -p 5432:5432 -v $PWD/src/main/database:/docker-entrypoint-initdb.d:ro,z docker.io/library/postgres:14
     java -jar target/quarkus-app/quarkus-run.jar
     ~~~
 
+8. You can query the application now from another terminal:
+
+    ~~~sh
+    curl -s http://localhost:8080/hello
+    ~~~
+
+    ~~~output
+    Hello Red Hat Academy
+    ~~~
+
+9. Before moving to the next lab, stop the application. Go to the terminal where you executed the `java` command and press `Ctrl+C`. You should see the following output:
+
+    ~~~output
+    2023-12-07 14:48:47,701 INFO  [io.quarkus] (main) library-shop stopped in 0.195s
+    ~~~
 
 ## Lab 3 - Building the container image
 
-- Build container image manually
+### Build container image manually
 
-1. Check the file Containerfile.jvm (src/main/docker)
+1. Check the file Containerfile.jvm (src/main/docker).
 
-    ~~~Dockerfile
-    FROM registry.access.redhat.com/ubi9/openjdk-17-runtime:1.17-1
-
-    ENV LANGUAGE='en_US:en'
-
-
-    # We make four distinct layers so if there are application changes the library-shop layers can be re-used
-    COPY --chown=185 target/quarkus-app/lib/ /deployments/lib/
-    COPY --chown=185 target/quarkus-app/*.jar /deployments/
-    COPY --chown=185 target/quarkus-app/app/ /deployments/app/
-    COPY --chown=185 target/quarkus-app/quarkus/ /deployments/quarkus/
-
-    EXPOSE 8080
-    USER 185
-    ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
-    ENV JAVA_APP_JAR="/deployments/quarkus-run.jar"
-
-    ENTRYPOINT [ "/opt/jboss/container/java/run/run-java.sh" ]
-    ~~~
-
-2. Open a terminal and execute the build command in the application directory
+2. In the terminal execute the build command in the application directory:
 
     ~~~sh
-    podman build -f ./src/main/docker/Containerfile.jvm -t rha/library-shop:1.0.0 .
+    cd ~/library-shop/
+    podman build -f src/main/docker/Containerfile.jvm -t rha/library-shop:1.0.0 .
     ~~~
 
-3. Inspect the created image
+3. Inspect the created image:
+
+    > **NOTE**: We can see the different layers, commands used, etc.
 
     ~~~sh
     podman inspect rha/library-shop:1.0.0
+    ~~~
 
+    ~~~output
     [
      {
           "Id": "e80167037960e12a56cba8f5d6d41a794d2815e37123c86dd177f6bdd56557de",
           "Digest": "sha256:be2ce6355483cf775f74ba73982976d02c3088da90de2d5dc5bf5e1548cf8176",
           "RepoTags": [
-               "localhost/rha/library-shop:1.0.0",
-               "localhost/rha/library-shop-docker:1.0.0"
+               "localhost/rha/library-shop:1.0.0"
           ],
     ...
     ~~~
 
-4. Run the generated container image
+4. We can run the application in a container now:
 
     ~~~sh
-    podman run --rm -it -e DATABASE_HOST=alumno -p 8080:8080 rha/library-shop:1.0.0
-
-    INFO exec -a "java" java -XX:MaxRAMPercentage=80.0 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:+ExitOnOutOfMemoryError -Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -cp "." -jar /deployments/quarkus-run.jar
-    INFO running in /deployments
-    __  ____  __  _____   ___  __ ____  ______
-    --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
-    -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \
-    --\___\_\____/_/ |_/_/|_/_/|_|\____/___/
-    2023-12-04 16:39:39,239 INFO  [io.quarkus] (main) library-shop 1.0.0 on JVM (powered by Quarkus 3.6.0) started in 2.739s. Listening on: http://0.0.0.0:8080
-    2023-12-04 16:39:39,241 INFO  [io.quarkus] (main) Profile prod activated.
+    podman run --name library-shop-app --rm -it -e DATABASE_HOST=fedora39-workstation -p 8080:8080 rha/library-shop:1.0.0
     ~~~
 
-5. Verify the application runs correct
+    ~~~output
+    INFO exec -a "java" java -XX:MaxRAMPercentage=80.0 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:+ExitOnOutOfMemoryError -Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -cp "." -jar /deployments/quarkus-run.jar 
+    INFO running in /deployments
+    __  ____  __  _____   ___  __ ____  ______ 
+     --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
+     -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
+    --\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
+    2023-12-07 15:02:07,652 INFO  [io.quarkus] (main) library-shop 1.0.0 on JVM (powered by Quarkus 3.6.0) started in 1.764s. Listening on: http://0.0.0.0:8080
+    2023-12-07 15:02:07,654 INFO  [io.quarkus] (main) Profile prod activated. 
+    2023-12-07 15:02:07,655 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, hibernate-orm-rest-data-panache, jdbc-postgresql, narayana-jta, resteasy-reactive, resteasy-reactive-jackson, resteasy-reactive-links, smallrye-context-propagation, smallrye-health, smallrye-openapi, swagger-ui, vertx]
+    ~~~
+
+5. In a different terminal verify the application runs correctly:
 
     ~~~sh
     curl -s http://localhost:8080/ehlo
+    ~~~
 
+    ~~~output
     ehlo from version v1 host localhost
     ~~~
 
-- Build the container image using Quarkus Jib Extension
-
-6. Open a terminal, change into the application directory and run the build command
+6. Stop the container:
 
     ~~~sh
-    ./mvnw package -Pjib
+    podman stop library-shop-app
+    ~~~
 
+### Build the container image using Quarkus Jib Extension
+
+1. In one of the terminals, change into the application directory and run the build command
+
+    ~~~sh
+    cd ~/library-shop/
+    ./mvnw package -Pjib
+    ~~~
+
+    ~~~output
     ...
     [INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Container entrypoint set to [java, -Djava.util.logging.manager=org.jboss.logmanager.LogManager, -jar, quarkus-run.jar]
     [INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Created container image rha/library-shop-jib:1.0.0 (sha256:811d30992a7dccf41c88b5ec00800ece3945372650bc2311c987c9af4867f8d6)
@@ -231,19 +273,38 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     [INFO] ------------------------------------------------------------------------
     ~~~
 
-7. Run the generated container image and verify the application runs correctly and check the differences between the previous container process.
+2. Run the generated container image and verify the application runs correctly and check the differences between the previous container process.
 
     ~~~sh
-    podman run --rm -it -e DATABASE_HOST=alumno -p 8080:8080 rha/library-shop-jib:1.0.0
+    podman run --name library-shop-app --rm -it -e DATABASE_HOST=fedora39-workstation -p 8080:8080 rha/library-shop-jib:1.0.0
     ~~~
 
-- Build the container image using Quarkus Docker Extension
-
-8. Open a terminal, change into the application directory and run the build command
+3. In a different terminal verify the application runs correctly:
 
     ~~~sh
-    ./mvnw package -Pdocker
+    curl -s http://localhost:8080/ehlo
+    ~~~
 
+    ~~~output
+    ehlo from version v1 host localhost
+    ~~~
+
+4. Stop the container:
+
+    ~~~sh
+    podman stop library-shop-app
+    ~~~
+
+### Build the container image using Quarkus Docker Extension
+
+1. In one of the terminals, change into the application directory and run the build command
+
+    ~~~sh
+    cd ~/library-shop/
+    ./mvnw package -Pdocker
+    ~~~
+
+    ~~~output
     ...
     [INFO] [io.quarkus.deployment.util.ExecUtil] COMMIT rha/library-shop-docker:1.0.0
     [INFO] [io.quarkus.deployment.util.ExecUtil] --> 2eb0ac51a204
@@ -257,70 +318,97 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     [INFO] ------------------------------------------------------------------------
     ~~~
 
-9. Run the generated container image and check the application runs correctly
+2. Run the generated container image and check the application runs correctly:
 
     ~~~sh
-    podman run --rm -it -e DATABASE_HOST=alumno -p 8080:8080 rha/library-shop-docker:1.0.0
+    podman run --name library-shop-app --rm -it -e DATABASE_HOST=fedora39-workstation -p 8080:8080 rha/library-shop-docker:1.0.0
     ~~~
 
-10. Compare the generated image with the generated manually running the podman command
+3. In a different terminal verify the application runs correctly:
+
+    ~~~sh
+    curl -s http://localhost:8080/ehlo
+    ~~~
+
+    ~~~output
+    ehlo from version v1 host localhost
+    ~~~
+
+4. Stop the container:
+
+    ~~~sh
+    podman stop library-shop-app
+    ~~~
+
+5. Compare the generated image with the generated manually running the podman command
 
     ~~~sh
     podman images | grep -i library-shop
 
-    rha/library-shop-docker:1.0.0      2eb0ac51a204  9 minutes ago   406 MB
-    rha/library-shop-jib:1.0.0         2866d5084033  16 minutes ago  406 MB
-    rha/library-shop:1.0.0             2eb0ac51a204  22 minutes ago  406 MB
+    localhost/rha/library-shop-docker                   1.0.0       5b0dd26b635c  2 minutes ago      406 MB
+    localhost/rha/library-shop-jib                      1.0.0       b15f3e3b6ab0  5 minutes ago      406 MB
+    localhost/rha/library-shop                          1.0.0       5c8c31912a20  About an hour ago  406 MB
     ~~~
 
 ## Lab 4 - Building the container image for the native application
 
-1. Open a terminal and execute the command to compile to native
+1. In one of the terminals, execute the command to compile to native:
 
-    NOTE: it may take some minutes to compile, add `-Dquarkus.native.builder-image.pull=never` to avoid pulling the mandrel container image again
+    > **NOTE**: it may take some minutes to compile, we added`-Dquarkus.native.builder-image.pull=never` to avoid pulling the mandrel container image again. For detailed information and explanations on the build output, visit [the docs](https://github.com/oracle/graal/blob/master/docs/reference-manual/native-image/BuildOutput.md).
 
     ~~~sh
-    ./mvnw package -Dnative -Dquarkus.native.container-build=true -Dquarkus.native.container-runtime=podman
+    cd ~/library-shop
+    ./mvnw package -Dnative -Dquarkus.native.builder-image.pull=never -Dquarkus.native.container-build=true -Dquarkus.native.container-runtime=podman
     ~~~
 
-    Check the command used to generated the native binary ...
+    > **NOTE**: This step may take up to 5 minutes to finish.
 
-    ~~~sh
-    ...
-    [INFO] [io.quarkus.deployment.pkg.steps.NativeImageBuildStep] Running Quarkus native-image plugin on MANDREL 23.1.1.0 JDK 21.0.1+12-LTS
-    [INFO] [io.quarkus.deployment.pkg.steps.NativeImageBuildRunner] podman run --env LANG=C --rm --user 1000:1000 --userns=keep-id ...
-    ~~~
-
-    For detailed information and explanations on the build output, visit:
-    https://github.com/oracle/graal/blob/master/docs/reference-manual/native-image/BuildOutput.md
-
-
-2. Verify the generated binary and run the application
-
-    ~~~sh
-    ls -l target/*-runner
-
-    -rwxr-xr-x. 1 alumno alumno 92462592 Dec  5 07:24 target/library-shop-1.0.0-runner
-    ~~~
-
-    Run the integration test suite with the native application
-
-    ~~~sh
-    ./mvnw test-compile failsafe:integration-test -Dnative
-
-    [INFO]
-    [INFO] Results:
-    [INFO]
-    [INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
-    [INFO]
+    ~~~output
+    Finished generating 'library-shop-1.0.0-runner' in 3m 29s.
+    [INFO] [io.quarkus.deployment.pkg.steps.NativeImageBuildRunner] podman run --env LANG=C --rm --user 1000:1000 --userns=keep-id -v /home/alumno/library-shop/target/library-shop-1.0.0-native-image-source-jar:/project:z --entrypoint /bin/bash quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21 -c objcopy --strip-debug library-shop-1.0.0-runner
+    [INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 219141ms
     [INFO] ------------------------------------------------------------------------
     [INFO] BUILD SUCCESS
     [INFO] ------------------------------------------------------------------------
+    [INFO] Total time:  03:59 min
+    [INFO] Finished at: 2023-12-07T16:32:58+01:00
+    [INFO] ------------------------------------------------------------------------
     ~~~
+
+2. Verify the generated binary:
+
+    ~~~sh
+    ls -l target/*-runner
+    ~~~
+
+    ~~~output
+    -rwxr-xr-x. 1 alumno alumno 92462592 Dec  5 07:24 target/library-shop-1.0.0-runner
+    ~~~
+
+    1. Run the integration test suite with the native application:
+
+        ~~~sh
+        ./mvnw test-compile failsafe:integration-test -Dnative
+        ~~~
+
+        ~~~output
+        [INFO]
+        [INFO] Results:
+        [INFO]
+        [INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+        [INFO]
+        [INFO] ------------------------------------------------------------------------
+        [INFO] BUILD SUCCESS
+        [INFO] ------------------------------------------------------------------------
+        ~~~
+
+3. Run the native application:
 
     ~~~sh
     target/library-shop-1.0.0-runner
+    ~~~
 
+    ~~~console
     __  ____  __  _____   ___  __ ____  ______
     --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
     -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \
@@ -330,72 +418,71 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     2023-12-05 07:53:40,253 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, hibernate-orm-rest-data-panache, jdbc-postgresql, narayana-jta, resteasy-reactive, resteasy-reactive-jackson, resteasy-reactive-links, smallrye-context-propagation, smallrye-health, smallrye-openapi, swagger-ui, vertx]
     ~~~
 
-3. Verify the application is running correctly
+4. In a different terminal, verify the application is running correctly:
 
     ~~~sh
     curl -s http://localhost:8080/ehlo
+    ~~~
 
+    ~~~output
     ehlo from version v1 host localhost
     ~~~
 
-    And check that connects to the database ...
-
     ~~~sh
     curl -s http://localhost:8080/library/
+    ~~~
 
+    ~~~output
     [{"id":1,"title":"The Hitchhiker's Guide to the Galaxy", ...}]
     ~~~
 
-4. Finally, build the container image for the native application.
+5. Stop the application. In the terminal where it's running press `Ctrl + C`.
 
-- Manually
+In the next section we will build the application in native binary format.
 
-5. Check the file Containerfile.native (src/main/docker)
+### Building the native application container image manually
 
-    ~~~Dockerfile
-    FROM registry.access.redhat.com/ubi8/ubi-minimal:8.9-1029
+1. Check the file Containerfile.native (src/main/docker)
 
-    WORKDIR /work/
-    RUN chown 1001 /work \
-        && chmod "g+rwX" /work \
-        && chown 1001:root /work
-    COPY --chown=1001:root target/*-runner /work/application
-
-    EXPOSE 8080
-    USER 1001
-
-    ENTRYPOINT ["./application", "-Dquarkus.http.host=0.0.0.0"]
-    ~~~
-
-6. Run the podman command to build the native image
+2. Run the podman command to build the native image
 
     ~~~sh
-    podman build -f ./src/main/docker/Containerfile.native -t rha/library-shop-native:1.0.0 .
-
-    COMMIT rha/library-shop-native:1.0.0
-    --> 3eb5839295ed
-    Successfully tagged localhost/rha/library-shop-native:1.0.0
+    cd ~/library-shop/
+    podman build -f src/main/docker/Containerfile.native -t rha/library-shop-native:1.0.0 .
     ~~~
 
-7. Run the container image and verify the app is running correctly
-
-    ~~~sh
-    podman run --rm -it -e DATABASE_HOST=alumno -p 8080:8080 rha/library-shop-native:1.0.0
-
-    __  ____  __  _____   ___  __ ____  ______
-    --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
-    -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \
-    --\___\_\____/_/ |_/_/|_/_/|_|\____/___/
-    2023-12-05 07:01:46,428 INFO  [io.quarkus] (main) library-shop 1.0.0 native (powered by Quarkus 3.6.0) started in 0.042s. Listening on: http://0.0.0.0:8080
-    2023-12-05 07:01:46,428 INFO  [io.quarkus] (main) Profile prod activated.
+    ~~~output
     ...
+    STEP 7/7: ENTRYPOINT ["./application", "-Dquarkus.http.host=0.0.0.0"]
+    COMMIT rha/library-shop-native:1.0.0
+    --> dec4939a705f
+    Successfully tagged localhost/rha/library-shop-native:1.0.0
+    dec4939a705f3f07a70c0ff1f8ae08489997f040a995471192ece25e2df3e19b
     ~~~
 
-    Add a book to the shop
+3. Run the container image and verify the app is running correctly
+
+    ~~~sh
+    podman run --name library-shop-app --rm -it -e DATABASE_HOST=fedora39-workstation -p 8080:8080 rha/library-shop-native:1.0.0
+    ~~~
+
+    ~~~output
+    __  ____  __  _____   ___  __ ____  ______ 
+     --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
+     -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
+    --\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
+    2023-12-07 19:06:16,577 INFO  [io.quarkus] (main) library-shop 1.0.0 native (powered by Quarkus 3.6.0) started in 0.039s. Listening on: http://0.0.0.0:8080
+    2023-12-07 19:06:16,577 INFO  [io.quarkus] (main) Profile prod activated. 
+    2023-12-07 19:06:16,577 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, hibernate-orm-rest-data-panache, jdbc-postgresql, narayana-jta, resteasy-reactive, resteasy-reactive-jackson, resteasy-reactive-links, smallrye-context-propagation, smallrye-health, smallrye-openapi, swagger-ui, vertx]
+    ~~~
+
+4. With the app running we can add a book to the library service. In a different terminal run the following command:
 
     ~~~sh
     curl -i -X POST http://localhost:8080/library -H "Content-type: application/json" -d '{"title":"The Difference Engine","year":1990,"isbn":"0-575-04762-3","price":12.0,"authors":[{"name":"William Gibson"},{"name":"Bruce Sterling"}]}'
+    ~~~
 
+    ~~~output
     HTTP/1.1 200 OK
     content-length: 153
     Content-Type: application/json;charset=UTF-8
@@ -403,11 +490,13 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     {"id":10,"title":"The Difference Engine","year":1990,"isbn":"0-575-04762-3","price":12.0,"authors":[{"name":"William Gibson"},{"name":"Bruce Sterling"}]}
     ~~~
 
-    Check the book was created successfully
+5. We can check that the book was created:
 
     ~~~sh
     curl -i -s http://localhost:8080/library/10
+    ~~~
 
+    ~~~output
     HTTP/1.1 200 OK
     content-length: 153
     Content-Type: application/json;charset=UTF-8
@@ -415,15 +504,24 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     {"id":10,"title":"The Difference Engine","year":1990,"isbn":"0-575-04762-3","price":12.0,"authors":[{"name":"William Gibson"},{"name":"Bruce Sterling"}]}
     ~~~
 
-    More information can be found in the [Quarkus Guide - Building a Native Executable](https://quarkus.io/guides/building-native-image) (https://quarkus.io/guides/building-native-image)
-
-- Build the image via the Quarkus Extensions
-
-8. (optional) Run the maven command to build the native image and the
+6. Finally, we stop the application:
 
     ~~~sh
-    ./mvnw verify -Dnative -Pdocker -Dquarkus.container-image.name=library-shop-docker-native -Dquarkus.native.reuse-existing=true
+    podman stop library-shop-app
+    ~~~
 
+More information around building a native executable can be found in the [official Quarkus docs](https://quarkus.io/guides/building-native-image).
+
+### Build the image via the Quarkus Extensions
+
+1. We can leverage the Quarkus extensions to get the container image built:
+
+    ~~~sh
+    cd ~/library-shop
+    ./mvnw verify -Dnative -Pdocker -Dquarkus.container-image.name=library-shop-docker-native -Dquarkus.native.reuse-existing=true
+    ~~~
+
+    ~~~output
     [INFO] [io.quarkus.deployment.util.ExecUtil] COMMIT rha/library-shop-docker-native:1.0.0
     [INFO] [io.quarkus.deployment.util.ExecUtil] --> 0877361cdb46
     [INFO] [io.quarkus.deployment.util.ExecUtil] Successfully tagged localhost/rha/library-shop-docker-native:1.0.0
@@ -431,11 +529,16 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     [INFO] [io.quarkus.container.image.docker.deployment.DockerProcessor] Built container image rha/library-shop-docker-native:1.0.0
     ~~~
 
-    Via Jib Container Extension
+### Build the image via the Jib Container Extension
+
+1. Jib also allows to get the container image built:
 
     ~~~sh
+    cd ~/library-shop
     ./mvnw package -Dnative -Pjib -Dquarkus.container-image.name=library-shop-jib-native -Dquarkus.native.reuse-existing=true
+    ~~~
 
+    ~~~output
     ...
     [WARNING] [io.quarkus.container.image.jib.deployment.JibProcessor] Base image 'quay.io/quarkus/quarkus-micro-image:2.0' does not use a specific image digest - build may not be reproducible
     [INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Using base image with digest: sha256:77a3524aca02a5875979ecfe06bb283af2960ed922264ceadd97865077e7b087
@@ -443,43 +546,22 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     [INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Created container image rha/library-shop-jib-native:1.0.0 (sha256:909d34b44768def9b940a771a4048c454c3a6457ebe139b9b098809996359c3a)
     ~~~
 
-9. (optional) Run the container images and check the application is running correctly
+### Comparing the different container images in size
 
-    Container image generated with Docker Extension
+During this lab we have built several container images, we will see how the one using the native binaries have a smaller footprint than the others.
 
-    ~~~sh
-    podman run --rm -it -e DATABASE_HOST=alumno -p 8080:8080 rha/library-shop-docker-native:1.0.0
 
-    __  ____  __  _____   ___  __ ____  ______
-    --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
-    -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \
-    --\___\_\____/_/ |_/_/|_/_/|_|\____/___/
-    2023-12-05 07:35:36,743 INFO  [io.quarkus] (main) library-shop 1.0.0 native (powered by Quarkus 3.6.0) started in 0.041s. Listening on: http://0.0.0.0:8080
-    2023-12-05 07:35:36,743 INFO  [io.quarkus] (main) Profile prod activated.
-    ~~~
+~~~sh
+podman images | grep -i library-shop
+~~~
 
-    Container image generated with Jib Extension
+~~~output
+localhost/rha/library-shop-jib-native               1.0.0       99074fdb7384  3 days ago     123 MB
+localhost/rha/library-shop-native                   1.0.0       dec4939a705f  3 days ago     187 MB
+localhost/rha/library-shop-docker-native            1.0.0       dec4939a705f  3 days ago     187 MB
+localhost/rha/library-shop-docker                   1.0.0       5b0dd26b635c  3 days ago     406 MB
+localhost/rha/library-shop-jib                      1.0.0       b15f3e3b6ab0  3 days ago     406 MB
+localhost/rha/library-shop                          1.0.0       5c8c31912a20  3 days ago     406 MB
+~~~
 
-    ~~~sh
-    podman run --rm -it -e DATABASE_HOST=alumno -p 8080:8080 rha/library-shop-jib-native:1.0.0
-
-    __  ____  __  _____   ___  __ ____  ______
-    --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
-    -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \
-    --\___\_\____/_/ |_/_/|_/_/|_|\____/___/
-    2023-12-05 07:37:52,731 INFO  [io.quarkus] (main) library-shop 1.0.0 native (powered by Quarkus 3.6.0) started in 0.041s. Listening on: http://0.0.0.0:8080
-    2023-12-05 07:37:52,731 INFO  [io.quarkus] (main) Profile prod activated.
-    ~~~
-
-10. Compare the generated container images
-
-    ~~~sh
-    podman images | grep -i library-shop
-
-    rha/library-shop-jib-native        45cf9fe1a674  17 minutes ago  123 MB
-    rha/library-shop-docker-native     7f01978dfc26  19 minutes ago  187 MB
-    rha/library-shop-native            3eb5839295ed  42 minutes ago  187 MB
-    rha/library-shop-docker            2eb0ac51a204  15 hours ago    406 MB
-    rha/library-shop                   2eb0ac51a204  15 hours ago    406 MB
-    rha/library-shop-jib               2866d5084033  15 hours ago    406 MB
-    ~~~
+As we can see, the natives ones are ~200MB smaller. This will lead to less storage utilization and also to faster startup times since the image will be pulled faster.
