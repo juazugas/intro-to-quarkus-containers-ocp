@@ -37,21 +37,21 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 5. Create the "dev" project
 
     ~~~sh
-    oc new-project alumno1--dev
+    oc new-project student1--dev
     ~~~
 
     ~~~output
-    Now using project "alumno1--dev" on server "https://api....:6443".
+    Now using project "student1--dev" on server "https://api....:6443".
     ~~~
 
     or switch to the project if already exists
 
     ~~~sh
-    oc project alumno1--dev
+    oc project student1--dev
     ~~~
 
     ~~~output
-    Already on project "alumno1--dev" on server "https://api....:6443".
+    Already on project "student1--dev" on server "https://api....:6443".
     ~~~
 
 6. (optional) Deploy the database
@@ -88,7 +88,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     ~~~
 
     ~~~output
-    In project alumno1--dev on server https://...:6443
+    In project student1--dev on server https://...:6443
 
     bc/library-shop-s2i source builds uploaded code on quay.io/jkube/jkube-java:0.0.20
     -> istag/library-shop:1.0.0
@@ -114,15 +114,15 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     [INFO] --- oc:1.15.0:apply (default-cli) @ library-shop ---
     [INFO] oc: OpenShift platform detected
     [INFO] oc: Using OpenShift at https://...:6443/ in namespace null with manifest target/classes/META-INF/jkube/openshift.yml
-    [INFO] oc: Creating a Secret in alumno1--dev namespace with name library-shop from openshift.yml
-    [INFO] oc: Created Secret: target/jkube/applyJson/alumno1--dev/secret-library-shop.json
-    [INFO] oc: Creating a Service in alumno1--dev namespace with name library-shop from openshift.yml
-    [INFO] oc: Created Service: target/jkube/applyJson/alumno1--dev/service-library-shop.json
-    [INFO] oc: Creating a ConfigMap in alumno1--dev namespace with name library-shop from openshift.yml
-    [INFO] oc: Created ConfigMap: target/jkube/applyJson/alumno1--dev/configmap-library-shop.json
-    [INFO] oc: Creating a Deployment in alumno1--dev namespace with name library-shop from openshift.yml
-    [INFO] oc: Created Deployment: target/jkube/applyJson/alumno1--dev/deployment-library-shop.json
-    [INFO] oc: Creating Route alumno1--dev:library-shop host: null
+    [INFO] oc: Creating a Secret in student1--dev namespace with name library-shop from openshift.yml
+    [INFO] oc: Created Secret: target/jkube/applyJson/student1--dev/secret-library-shop.json
+    [INFO] oc: Creating a Service in student1--dev namespace with name library-shop from openshift.yml
+    [INFO] oc: Created Service: target/jkube/applyJson/student1--dev/service-library-shop.json
+    [INFO] oc: Creating a ConfigMap in student1--dev namespace with name library-shop from openshift.yml
+    [INFO] oc: Created ConfigMap: target/jkube/applyJson/student1--dev/configmap-library-shop.json
+    [INFO] oc: Creating a Deployment in student1--dev namespace with name library-shop from openshift.yml
+    [INFO] oc: Created Deployment: target/jkube/applyJson/student1--dev/deployment-library-shop.json
+    [INFO] oc: Creating Route student1--dev:library-shop host: null
     [INFO] oc: HINT: Use the command `oc get pods -w` to watch your pods start up
     ~~~
 
@@ -150,13 +150,13 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     ~~~
 
     ~~~output
-    library-shop-alumno1--dev.apps...
+    library-shop-student1--dev.apps...
     ~~~
 
     Request the application data
 
     ~~~sh
-    curl -k -s https://library-shop-alumno1--dev.apps...
+    curl -k -s https://library-shop-student1--dev.apps...
     ~~~
 
     ~~~output
@@ -164,7 +164,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     ~~~
 
     ~~~sh
-    curl -k -s https://library-shop-alumno1--dev.apps...ehlo/database
+    curl -k -s https://library-shop-student1--dev.apps...ehlo/database
     ~~~
 
     ~~~output
@@ -172,11 +172,11 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     ~~~
 
     ~~~sh
-    curl -k -s https://library-shop-alumno1--dev.apps.../hello
+    curl -k -s https://library-shop-student1--dev.apps.../hello
     ~~~
 
     ~~~sh
-    curl -k -s https://library-shop-alumno1--dev.apps.../library
+    curl -k -s https://library-shop-student1--dev.apps.../library
     ~~~
 
 ## Lab 2 - Deploy &nbsp; *in production* &nbsp; the Quarkus application
@@ -184,11 +184,11 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 1. Change to the production namespace
 
     ~~~sh
-    oc project alumno1
+    oc project student1
     ~~~
 
     ~~~output
-    Now using project "alumno1" on server "https://api....:6443".
+    Now using project "student1" on server "https://api....:6443".
     ~~~
 
 2. Inspect the OpenShift Pipeline resource
@@ -226,7 +226,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
         --serviceaccount=pipeline \
         -p deployment-name=library-shop \
         -p git-url=https://github.com/juazugas/rha-quarkus-library-shop.git \
-        -p backend-image=image-registry.openshift-image-registry.svc:5000/alumno1/library-shop:1.0.0 \
+        -p backend-image=image-registry.openshift-image-registry.svc:5000/student1/library-shop:1.0.0 \
         -l group=rhacademy,app=library-shop \
         --use-param-defaults
     ~~~

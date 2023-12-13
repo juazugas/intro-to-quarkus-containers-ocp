@@ -79,8 +79,8 @@ Instructions to create and configure the pipeline in the production project for 
     apiVersion: route.openshift.io/v1
     kind: Route
     metadata:
-    annotations:
-        openshift.io/host.generated: "true"
+        annotations:
+            openshift.io/host.generated: "true"
     ...
     labels:
         app: library-shop-pipelines
