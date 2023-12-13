@@ -15,7 +15,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     ./mvnw package
     ~~~
 
-    For the native image run the command:
+    (optional) For the native image run the command:
 
     ~~~sh
     ./mvnw package -Dnative -Dquarkus.native.container-build=true -Dquarkus.native.container-runtime=podman
@@ -23,13 +23,10 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
 4. Login into OpenShift
 
-    1. Access the [OpenShift Console URL](https://console-openshift-console.apps-crc.testing/)
+    1. Access the OpenShift Console URL
     2. Access the "User menu" and open "Copy login command" option
     3. Display and copy the login command with the token
-
-    ~~~sh
-    oc login --token=sha256~Ke3yfBYcJP8vqGTbB-DwJQeKFcypwfq1vKPFlGsQBWU --server=https://api.crc.testing:6443
-    ~~~
+    4. Paste the command on a terminal
 
     ~~~output
     You have access to the following projects and can switch between them with 'oc project <projectname>':
@@ -40,21 +37,21 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 5. Create the "dev" project
 
     ~~~sh
-    oc new-project alumno-n1--dev
+    oc new-project alumno1--dev
     ~~~
 
     ~~~output
-    Now using project "alumno-n1--dev" on server "https://api.crc.testing:6443".
+    Now using project "alumno1--dev" on server "https://api....:6443".
     ~~~
 
     or switch to the project if already exists
 
     ~~~sh
-    oc project alumno-n1--dev
+    oc project alumno1--dev
     ~~~
 
     ~~~output
-    Already on project "alumno-n1--dev" on server "https://api.crc.testing:6443".
+    Already on project "alumno1--dev" on server "https://api....:6443".
     ~~~
 
 6. (optional) Deploy the database
@@ -91,11 +88,11 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     ~~~
 
     ~~~output
-    In project alumno-n2--test on server https://api.crc.testing:6443
+    In project alumno1--dev on server https://...:6443
 
-    bc/library-shop-s2i source builds uploaded code on quay.io/quarkus/ubi-quarkus-native-binary-s2i:1.0
-        -> istag/library-shop:1.0.0
-        build #1 succeeded 11 minutes ago
+    bc/library-shop-s2i source builds uploaded code on quay.io/jkube/jkube-java:0.0.20
+    -> istag/library-shop:1.0.0
+    build #1 succeeded 38 seconds ago
     ~~~
 
     ~~~sh
@@ -116,16 +113,16 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     ~~~output
     [INFO] --- oc:1.15.0:apply (default-cli) @ library-shop ---
     [INFO] oc: OpenShift platform detected
-    [INFO] oc: Using OpenShift at https://api.crc.testing:6443/ in namespace null with manifest target/classes/META-INF/jkube/openshift.yml
-    [INFO] oc: Creating a Secret in alumno-n2--test namespace with name library-shop from openshift.yml
-    [INFO] oc: Created Secret: target/jkube/applyJson/alumno-n2--test/secret-library-shop.json
-    [INFO] oc: Creating a Service in alumno-n2--test namespace with name library-shop from openshift.yml
-    [INFO] oc: Created Service: target/jkube/applyJson/alumno-n2--test/service-library-shop.json
-    [INFO] oc: Creating a ConfigMap in alumno-n2--test namespace with name library-shop from openshift.yml
-    [INFO] oc: Created ConfigMap: target/jkube/applyJson/alumno-n2--test/configmap-library-shop.json
-    [INFO] oc: Creating a Deployment in alumno-n2--test namespace with name library-shop from openshift.yml
-    [INFO] oc: Created Deployment: target/jkube/applyJson/alumno-n2--test/deployment-library-shop.json
-    [INFO] oc: Creating Route alumno-n2--test:library-shop host: null
+    [INFO] oc: Using OpenShift at https://...:6443/ in namespace null with manifest target/classes/META-INF/jkube/openshift.yml
+    [INFO] oc: Creating a Secret in alumno1--dev namespace with name library-shop from openshift.yml
+    [INFO] oc: Created Secret: target/jkube/applyJson/alumno1--dev/secret-library-shop.json
+    [INFO] oc: Creating a Service in alumno1--dev namespace with name library-shop from openshift.yml
+    [INFO] oc: Created Service: target/jkube/applyJson/alumno1--dev/service-library-shop.json
+    [INFO] oc: Creating a ConfigMap in alumno1--dev namespace with name library-shop from openshift.yml
+    [INFO] oc: Created ConfigMap: target/jkube/applyJson/alumno1--dev/configmap-library-shop.json
+    [INFO] oc: Creating a Deployment in alumno1--dev namespace with name library-shop from openshift.yml
+    [INFO] oc: Created Deployment: target/jkube/applyJson/alumno1--dev/deployment-library-shop.json
+    [INFO] oc: Creating Route alumno1--dev:library-shop host: null
     [INFO] oc: HINT: Use the command `oc get pods -w` to watch your pods start up
     ~~~
 
@@ -142,7 +139,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     library-shop-s2i-1-build        0/1     Completed   0          21m
     ~~~
 
-    NOTE: Ctrl+C to exit from the watch
+    Type Ctrl+C to exit from the watch
 
 9. Check the application is working correctly
 
@@ -153,13 +150,13 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     ~~~
 
     ~~~output
-    library-shop-alumno-n1--dev.apps-crc.testing
+    library-shop-alumno1--dev.apps...
     ~~~
 
     Request the application data
 
     ~~~sh
-    curl -k -s https://library-shop-alumno-n2--dev.apps-crc.testing/ehlo
+    curl -k -s https://library-shop-alumno1--dev.apps...
     ~~~
 
     ~~~output
@@ -167,7 +164,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     ~~~
 
     ~~~sh
-    curl -k -s https://library-shop-alumno-n2--dev.apps-crc.testing/ehlo/database
+    curl -k -s https://library-shop-alumno1--dev.apps...ehlo/database
     ~~~
 
     ~~~output
@@ -175,11 +172,11 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     ~~~
 
     ~~~sh
-    curl -k -s https://library-shop-alumno-n2--dev.apps-crc.testing/hello
+    curl -k -s https://library-shop-alumno1--dev.apps.../hello
     ~~~
 
     ~~~sh
-    curl -k -s https://library-shop-alumno-n2--dev.apps-crc.testing/library
+    curl -k -s https://library-shop-alumno1--dev.apps.../library
     ~~~
 
 ## Lab 2 - Deploy &nbsp; *in production* &nbsp; the Quarkus application
@@ -187,14 +184,12 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 1. Change to the production namespace
 
     ~~~sh
-    oc project alumno-n1
+    oc project alumno1
     ~~~
 
     ~~~output
-    Now using project "alumno-n1" on server "https://api.crc.testing:6443".
+    Now using project "alumno1" on server "https://api....:6443".
     ~~~
-
-    TODO: add a link to the README.md in the demo2-assets directory how to configure the pipeline in the namespace
 
 2. Inspect the OpenShift Pipeline resource
 
@@ -222,6 +217,8 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
 3. Execute the pipeline
 
+    via command
+
     ~~~sh
     tkn pipeline start library-shop-pipeline \
         -w name=shared-workspace,volumeClaimTemplateFile=https://github.com/juazugas/intro-to-quarkus-containers-ocp/raw/main/demo2-assets/openshift/prod/pipeline/library-shop-source.pvc.yaml \
@@ -229,7 +226,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
         --serviceaccount=pipeline \
         -p deployment-name=library-shop \
         -p git-url=https://github.com/juazugas/rha-quarkus-library-shop.git \
-        -p backend-image=image-registry.openshift-image-registry.svc:5000/alumno/library-shop:1.0.0 \
+        -p backend-image=image-registry.openshift-image-registry.svc:5000/alumno1/library-shop:1.0.0 \
         -l group=rhacademy,app=library-shop \
         --use-param-defaults
     ~~~
@@ -261,3 +258,32 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
     3. Check the status of the Trigger and EventListener via the Administrator console \
     (Administrator -> Pipelines -> Triggers)
+
+6. Trigger the pipeline
+
+    Produce a commit in the application
+
+    ~~~sh
+    git commit -m 'trigger pipeline' --allow-empty
+    ~~~
+
+    Push the application to the git remote repository
+
+    ~~~sh
+    git push origin main
+    ~~~
+
+7. Review the running pipeline
+
+    via command :
+
+    ~~~sh
+    tkn pr ls
+    ~~~
+
+    ~~~output
+    NAME                        STARTED           DURATION   STATUS
+    library-shop-trigger-72crf   21 seconds ago   ---        Running
+    ~~~
+
+    Or graphicaly via the Web console on the Pipelines section
