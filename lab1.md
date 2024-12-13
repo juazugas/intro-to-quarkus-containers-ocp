@@ -19,7 +19,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 
 5. Open the folder containing the application in Visual Studio Code. In the VSCode Menu click on `File` -> `Open Folder` -> `Carpeta personal` -> `library-shop` -> `Abrir`.
 
-6. Run the application in dev mode from the terminal:
+6. Run the application in dev mode from the terminal (check step 3 to open a new terminal):
 
     ~~~sh
     ./mvnw compile quarkus:dev
