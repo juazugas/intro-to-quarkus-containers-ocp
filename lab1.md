@@ -4,7 +4,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 
 ## Lab 1 - Running our first quarkus application
 
-1. Connect to the Fedora 39 system.
+1. Connect to the Fedora 41 system.
 
 2. Open the `Visual Studio Code` application.
 
@@ -30,9 +30,9 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     > **NOTE**: At this point the application is running.
 
     ~~~console
-    2023-12-07 11:51:59,498 INFO  [io.quarkus] (Quarkus Main Thread) library-shop 1.0.0 on JVM (powered by Quarkus 3.6.0) started in 8.267s. Listening on: http://localhost:8080
-    2023-12-07 11:51:59,499 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
-    2023-12-07 11:51:59,500 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, hibernate-orm-rest-data-panache, jdbc-postgresql, narayana-jta, resteasy-reactive, resteasy-reactive-jackson, resteasy-reactive-links, smallrye-context-propagation, smallrye-health, smallrye-openapi, swagger-ui, vertx]
+    2024-12-13 12:00:14,288 INFO  [io.quarkus] (Quarkus Main Thread) library-shop 1.0.0 on JVM (powered by Quarkus 3.17.2) started in 20.200s. Listening on: http://localhost:8080
+    2024-12-13 12:00:14,296 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+    2024-12-13 12:00:14,297 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, hibernate-orm-rest-data-panache, jdbc-postgresql, narayana-jta, rest, rest-jackson, rest-links, smallrye-context-propagation, smallrye-health, smallrye-openapi, swagger-ui, vertx]
     ~~~
 
 8. The terminal we previously opened is now running our application, we will open a new terminal to run the following commands. On the top menu, click `Terminal` -> `New Terminal`.
@@ -44,7 +44,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     ~~~
 
     ~~~output
-    467e8b4bbc4d  docker.io/library/postgres:14        postgres -c fsync...  2 minutes ago  Up 2 minutes  0.0.0.0:5432->5432/tcp   inspiring_jemison
+    6da04462bde3  docker.io/library/postgres:17         postgres -c fsync...  2 seconds ago  Up 3 seconds  0.0.0.0:5432->5432/tcp   loving_mclaren
     ~~~
 
 10. Access the container and check the database was initialized by the application:
@@ -56,7 +56,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 
     ~~~output
             List of relations
-     Schema |     Name     | Type  |  Owner  
+     Schema |     Name     | Type  |  Owner
     --------+--------------+-------+---------
      public | book         | table | quarkus
      public | book_authors | table | quarkus
@@ -87,7 +87,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     ~~~
 
     ~~~output
-    ehlo from PostgreSQL 15.3 on x86_64-redhat-linux-gnu, compiled by gcc (GCC) 8.5.0 20210514 (Red Hat 8.5.0-18), 64-bit
+    ehlo from PostgreSQL 17.2 (Debian 17.2-1.pgdg120+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14) 12.2.0, 64-bit
     ~~~
 
 ## Lab 2 - Developing the application
@@ -167,7 +167,8 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 7. Execute the application using the generated binaries and podman for running the database:
 
     ~~~sh
-    podman run -d --name pg-library-shop -e POSTGRES_USER=quarkus -e POSTGRES_PASSWORD=quarkus -e POSTGRESQL_DATABASE=quarkus -p 5432:5432 -v $PWD/src/main/database:/docker-entrypoint-initdb.d:ro,z docker.io/library/postgres:14
+    podman network create rhademo --ignore
+    podman run --net rhademo --rm -d --name pg-library-shop -e POSTGRES_USER=quarkus -e POSTGRES_PASSWORD=quarkus -e POSTGRESQL_DATABASE=quarkus -p 5432:5432 -v $PWD/src/main/database:/docker-entrypoint-initdb.d:ro,z docker.io/library/postgres:17
     java -jar target/quarkus-app/quarkus-run.jar
     ~~~
 
@@ -184,7 +185,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 9. Before moving to the next lab, stop the application. Go to the terminal where you executed the `java` command and press `Ctrl+C`. You should see the following output:
 
     ~~~output
-    2023-12-07 14:48:47,701 INFO  [io.quarkus] (main) library-shop stopped in 0.195s
+    2024-12-13 15:11:57,415 INFO  [io.quarkus] (main) library-shop stopped in 0.036s
     ~~~
 
 ## Lab 3 - Building the container image
@@ -222,22 +223,26 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 4. We can run the application in a container now:
 
     ~~~sh
-    podman run --name library-shop-app --rm -it -e DATABASE_HOST=fedora39-workstation -p 8080:8080 rha/library-shop:1.0.0
+    podman run --net rhademo --name library-shop-app --rm -d -e DATABASE_HOST=pg-library-shop -p 8080:8080 rha/library-shop:1.0.0
+    ~~~
+
+    ~~~sh
+    podman logs library-shop-app
     ~~~
 
     ~~~output
-    INFO exec -a "java" java -XX:MaxRAMPercentage=80.0 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:+ExitOnOutOfMemoryError -Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -cp "." -jar /deployments/quarkus-run.jar 
+    INFO exec -a "java" java -XX:MaxRAMPercentage=80.0 -XX:+UseParallelGC -XX:MinHeapFreeRatio=10 -XX:MaxHeapFreeRatio=20 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -XX:+ExitOnOutOfMemoryError -Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager -cp "." -jar /deployments/quarkus-run.jar
     INFO running in /deployments
-    __  ____  __  _____   ___  __ ____  ______ 
-     --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
-     -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
-    --\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
-    2023-12-07 15:02:07,652 INFO  [io.quarkus] (main) library-shop 1.0.0 on JVM (powered by Quarkus 3.6.0) started in 1.764s. Listening on: http://0.0.0.0:8080
-    2023-12-07 15:02:07,654 INFO  [io.quarkus] (main) Profile prod activated. 
-    2023-12-07 15:02:07,655 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, hibernate-orm-rest-data-panache, jdbc-postgresql, narayana-jta, resteasy-reactive, resteasy-reactive-jackson, resteasy-reactive-links, smallrye-context-propagation, smallrye-health, smallrye-openapi, swagger-ui, vertx]
+    __  ____  __  _____   ___  __ ____  ______
+    --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
+    -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \
+    --\___\_\____/_/ |_/_/|_/_/|_|\____/___/
+    2024-12-13 15:32:24,215 INFO  [io.quarkus] (main) library-shop 1.0.0 on JVM (powered by Quarkus 3.17.2) started in 1.989s. Listening on: http://0.0.0.0:8080
+    2024-12-13 15:32:24,218 INFO  [io.quarkus] (main) Profile prod activated.
+    2024-12-13 15:32:24,219 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, hibernate-orm-rest-data-panache, jdbc-postgresql, narayana-jta, rest, rest-jackson, rest-links, smallrye-context-propagation, smallrye-health, smallrye-openapi, swagger-ui, vertx]
     ~~~
 
-5. In a different terminal verify the application runs correctly:
+5. Verify the application runs correctly:
 
     ~~~sh
     curl -s http://localhost:8080/ehlo
@@ -247,7 +252,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     ehlo from version v1 host localhost
     ~~~
 
-6. Stop the container:
+6. Stop the container with `Ctrl + c` on the terminal
 
     ~~~sh
     podman stop library-shop-app
@@ -264,10 +269,10 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 
     ~~~output
     ...
-    [INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Container entrypoint set to [java, -Djava.util.logging.manager=org.jboss.logmanager.LogManager, -jar, quarkus-run.jar]
-    [INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Created container image rha/library-shop-jib:1.0.0 (sha256:811d30992a7dccf41c88b5ec00800ece3945372650bc2311c987c9af4867f8d6)
+    [INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Container entrypoint set to [/opt/jboss/container/java/run/run-java.sh]
+    [INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Created container image rha/library-shop-jib:1.0.0 (sha256:5da55cd92fbf03c7e3f39200d92e4dff6e3c896383afdf4f6c9e33d91e34061c)
 
-    [INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 9947ms
+    [INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 16426ms
     [INFO] ------------------------------------------------------------------------
     [INFO] BUILD SUCCESS
     [INFO] ------------------------------------------------------------------------
@@ -276,10 +281,10 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 2. Run the generated container image and verify the application runs correctly and check the differences between the previous container process.
 
     ~~~sh
-    podman run --name library-shop-app --rm -it -e DATABASE_HOST=fedora39-workstation -p 8080:8080 rha/library-shop-jib:1.0.0
+    podman run --net rhademo --name library-shop-app --rm -d -e DATABASE_HOST=pg-library-shop -p 8080:8080 rha/library-shop-jib:1.0.0
     ~~~
 
-3. In a different terminal verify the application runs correctly:
+3. Verify the application runs correctly:
 
     ~~~sh
     curl -s http://localhost:8080/ehlo
@@ -307,12 +312,12 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     ~~~output
     ...
     [INFO] [io.quarkus.deployment.util.ExecUtil] COMMIT rha/library-shop-docker:1.0.0
-    [INFO] [io.quarkus.deployment.util.ExecUtil] --> 2eb0ac51a204
+    [INFO] [io.quarkus.deployment.util.ExecUtil] --> 8041fd1c34a1
     [INFO] [io.quarkus.deployment.util.ExecUtil] Successfully tagged localhost/rha/library-shop-docker:1.0.0
-    [INFO] [io.quarkus.deployment.util.ExecUtil] 2eb0ac51a2042742c46897d822bcf8d4c065688ad107933db64375dd411dfb61
+    [INFO] [io.quarkus.deployment.util.ExecUtil] 8041fd1c34a19c00ea783bca1cc5a68cf0cb971ea84033c9f936d845596eaa6a
     [INFO] [io.quarkus.container.image.docker.deployment.DockerProcessor] Built container image rha/library-shop-docker:1.0.0
 
-    [INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 5802ms
+    [INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 7240ms
     [INFO] ------------------------------------------------------------------------
     [INFO] BUILD SUCCESS
     [INFO] ------------------------------------------------------------------------
@@ -321,10 +326,10 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 2. Run the generated container image and check the application runs correctly:
 
     ~~~sh
-    podman run --name library-shop-app --rm -it -e DATABASE_HOST=fedora39-workstation -p 8080:8080 rha/library-shop-docker:1.0.0
+    podman run --net rhademo --name library-shop-app --rm -d -e DATABASE_HOST=pg-library-shop -p 8080:8080 rha/library-shop-docker:1.0.0
     ~~~
 
-3. In a different terminal verify the application runs correctly:
+3. Verify the application runs correctly:
 
     ~~~sh
     curl -s http://localhost:8080/ehlo
@@ -344,10 +349,12 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 
     ~~~sh
     podman images | grep -i library-shop
+    ~~~
 
+    ~~~output
     localhost/rha/library-shop-docker                   1.0.0       5b0dd26b635c  2 minutes ago      406 MB
     localhost/rha/library-shop-jib                      1.0.0       b15f3e3b6ab0  5 minutes ago      406 MB
-    localhost/rha/library-shop                          1.0.0       5c8c31912a20  About an hour ago  406 MB
+    localhost/rha/library-shop                          1.0.0       5c8c31912a20  35 minutes ago      406 MB
     ~~~
 
 ## Lab 4 - Building the container image for the native application
@@ -364,14 +371,24 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     > **NOTE**: This step may take up to 5 minutes to finish.
 
     ~~~output
-    Finished generating 'library-shop-1.0.0-runner' in 3m 29s.
-    [INFO] [io.quarkus.deployment.pkg.steps.NativeImageBuildRunner] podman run --env LANG=C --rm --user 1000:1000 --userns=keep-id -v /home/alumno/library-shop/target/library-shop-1.0.0-native-image-source-jar:/project:z --entrypoint /bin/bash quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21 -c objcopy --strip-debug library-shop-1.0.0-runner
-    [INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 219141ms
+    [INFO] [io.quarkus.deployment.pkg.steps.NativeImageBuildStep] Running Quarkus native-image plugin on MANDREL 23.1.5.0 JDK 21.0.5+11-LTS
+    [INFO] [io.quarkus.deployment.pkg.steps.NativeImageBuildRunner] podman run --env LANG=C --rm --user 1000:1000 --userns=keep-id -v /home/fedora/library-shop/target/library-shop-1.0.0-native-image-source-jar:/project:z --name build-native-ShcBl quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21 -J-DCoordinatorEnvironmentBean.transactionStatusManagerEnable=false -J-Dsun.nio.ch.maxUpdateArraySize=100 -J-Djava.util.logging.manager=org.jboss.logmanager.LogManager -J-Duser.language=en -J-Duser.country=US -J-Dlogging.initial-configurator.min-level=500 -J-Dvertx.logger-delegate-factory-class-name=io.quarkus.vertx.core.runtime.VertxLogDelegateFactory -J-Dvertx.disableDnsResolver=true -J-Dio.netty.leakDetection.level=DISABLED -J-Dio.netty.allocator.maxOrder=3 -H:+UnlockExperimentalVMOptions -H:IncludeLocales=en-US -H:-UnlockExperimentalVMOptions -J-Dfile.encoding=UTF-8 --features=io.quarkus.caffeine.runtime.graal.CacheConstructorsFeature,io.quarkus.jdbc.postgresql.runtime.graal.SQLXMLFeature,io.quarkus.runner.Feature,io.quarkus.runtime.graal.DisableLoggingFeature,io.quarkus.hibernate.orm.runtime.graal.DisableLoggingFeature,org.hibernate.graalvm.internal.GraalVMStaticFeature -J--add-exports=java.security.jgss/sun.security.krb5=ALL-UNNAMED -J--add-exports=java.security.jgss/sun.security.jgss=ALL-UNNAMED -J--add-opens=java.base/java.text=ALL-UNNAMED -J--add-opens=java.base/java.io=ALL-UNNAMED -J--add-opens=java.base/java.lang.invoke=ALL-UNNAMED -J--add-opens=java.base/java.util=ALL-UNNAMED -H:+UnlockExperimentalVMOptions -H:BuildOutputJSONFile=library-shop-1.0.0-runner-build-output-stats.json -H:-UnlockExperimentalVMOptions -H:+UnlockExperimentalVMOptions -H:+GenerateBuildArtifactsFile -H:-UnlockExperimentalVMOptions --strict-image-heap -H:+UnlockExperimentalVMOptions -H:+AllowFoldMethods -H:-UnlockExperimentalVMOptions -J-Djava.awt.headless=true --no-fallback --link-at-build-time -H:+UnlockExperimentalVMOptions -H:+ReportExceptionStackTraces -H:-UnlockExperimentalVMOptions -H:-AddAllCharsets --enable-url-protocols=http,https --enable-monitoring=heapdump -H:+UnlockExperimentalVMOptions -H:-UseServiceLoaderFeature -H:-UnlockExperimentalVMOptions -J--add-exports=org.graalvm.nativeimage/org.graalvm.nativeimage.impl=ALL-UNNAMED --exclude-config io\.netty\.netty-codec /META-INF/native-image/io\.netty/netty-codec/generated/handlers/reflect-config\.json --exclude-config io\.netty\.netty-handler /META-INF/native-image/io\.netty/netty-handler/generated/handlers/reflect-config\.json library-shop-1.0.0-runner -jar library-shop-1.0.0-runner.jar
+    ...
+    [3/8] Building universe...
+    ...
+    Produced artifacts:
+    /project/build-artifacts.json (build_info)
+    /project/library-shop-1.0.0-runner (executable)
+    /project/library-shop-1.0.0-runner-build-output-stats.json (build_info)
+    ========================================================================================================================
+    Finished generating 'library-shop-1.0.0-runner' in 5m 6s.
+    ...
+    [INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 340903ms
     [INFO] ------------------------------------------------------------------------
     [INFO] BUILD SUCCESS
     [INFO] ------------------------------------------------------------------------
-    [INFO] Total time:  03:59 min
-    [INFO] Finished at: 2023-12-07T16:32:58+01:00
+    [INFO] Total time:  05:59 min
+    [INFO] Finished at: 2024-12-13T15:53:57Z
     [INFO] ------------------------------------------------------------------------
     ~~~
 
@@ -382,27 +399,27 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     ~~~
 
     ~~~output
-    -rwxr-xr-x. 1 alumno alumno 92462592 Dec  5 07:24 target/library-shop-1.0.0-runner
+    -rwxr-xr-x. 1 alumno alumno 97485696 Dec  5 07:24 target/library-shop-1.0.0-runner
     ~~~
 
-    1. Run the integration test suite with the native application:
+3. Run the integration test suite with the native application:
 
-        ~~~sh
-        ./mvnw test-compile failsafe:integration-test -Dnative
-        ~~~
+    ~~~sh
+    ./mvnw test-compile failsafe:integration-test -Dnative
+    ~~~
 
-        ~~~output
-        [INFO]
-        [INFO] Results:
-        [INFO]
-        [INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
-        [INFO]
-        [INFO] ------------------------------------------------------------------------
-        [INFO] BUILD SUCCESS
-        [INFO] ------------------------------------------------------------------------
-        ~~~
+    ~~~output
+    [INFO]
+    [INFO] Results:
+    [INFO]
+    [INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+    [INFO]
+    [INFO] ------------------------------------------------------------------------
+    [INFO] BUILD SUCCESS
+    [INFO] ------------------------------------------------------------------------
+    ~~~
 
-3. Run the native application:
+4. Run the native application:
 
     ~~~sh
     target/library-shop-1.0.0-runner
@@ -413,12 +430,12 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
     -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \
     --\___\_\____/_/ |_/_/|_/_/|_|\____/___/
-    2023-12-05 07:53:40,252 INFO  [io.quarkus] (main) library-shop 1.0.0 native (powered by Quarkus 3.6.0) started in 0.047s. Listening on: http://0.0.0.0:8080
-    2023-12-05 07:53:40,253 INFO  [io.quarkus] (main) Profile prod activated.
-    2023-12-05 07:53:40,253 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, hibernate-orm-rest-data-panache, jdbc-postgresql, narayana-jta, resteasy-reactive, resteasy-reactive-jackson, resteasy-reactive-links, smallrye-context-propagation, smallrye-health, smallrye-openapi, swagger-ui, vertx]
+    2024-12-13 15:59:19,744 INFO  [io.quarkus] (main) library-shop 1.0.0 native (powered by Quarkus 3.17.2) started in 0.046s. Listening on: http://0.0.0.0:8080
+    2024-12-13 15:59:19,744 INFO  [io.quarkus] (main) Profile prod activated.
+    2024-12-13 15:59:19,744 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, hibernate-orm-rest-data-panache, jdbc-postgresql, narayana-jta, rest, rest-jackson, rest-links, smallrye-context-propagation, smallrye-health, smallrye-openapi, swagger-ui, vertx]
     ~~~
 
-4. In a different terminal, verify the application is running correctly:
+5. In a different terminal, verify the application is running correctly:
 
     ~~~sh
     curl -s http://localhost:8080/ehlo
@@ -436,7 +453,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     [{"id":1,"title":"The Hitchhiker's Guide to the Galaxy", ...}]
     ~~~
 
-5. Stop the application. In the terminal where it's running press `Ctrl + C`.
+6. Stop the application. In the terminal where it's running press `Ctrl + C`.
 
 In the next section we will build the application in native binary format.
 
@@ -463,17 +480,18 @@ In the next section we will build the application in native binary format.
 3. Run the container image and verify the app is running correctly
 
     ~~~sh
-    podman run --name library-shop-app --rm -it -e DATABASE_HOST=fedora39-workstation -p 8080:8080 rha/library-shop-native:1.0.0
+    podman run --net rhademo --name library-shop-app --rm -d -e DATABASE_HOST=pg-library-shop -p 8080:8080 rha/library-shop-native:1.0.0 && \
+    podman logs library-shop-app
     ~~~
 
     ~~~output
-    __  ____  __  _____   ___  __ ____  ______ 
-     --/ __ \/ / / / _ | / _ \/ //_/ / / / __/ 
-     -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \   
-    --\___\_\____/_/ |_/_/|_/_/|_|\____/___/   
-    2023-12-07 19:06:16,577 INFO  [io.quarkus] (main) library-shop 1.0.0 native (powered by Quarkus 3.6.0) started in 0.039s. Listening on: http://0.0.0.0:8080
-    2023-12-07 19:06:16,577 INFO  [io.quarkus] (main) Profile prod activated. 
-    2023-12-07 19:06:16,577 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, hibernate-orm-rest-data-panache, jdbc-postgresql, narayana-jta, resteasy-reactive, resteasy-reactive-jackson, resteasy-reactive-links, smallrye-context-propagation, smallrye-health, smallrye-openapi, swagger-ui, vertx]
+    __  ____  __  _____   ___  __ ____  ______
+    --/ __ \/ / / / _ | / _ \/ //_/ / / / __/
+    -/ /_/ / /_/ / __ |/ , _/ ,< / /_/ /\ \
+    --\___\_\____/_/ |_/_/|_/_/|_|\____/___/
+    2024-12-13 16:07:33,260 INFO  [io.quarkus] (main) library-shop 1.0.0 native (powered by Quarkus 3.17.2) started in 0.048s. Listening on: http://0.0.0.0:8080
+    2024-12-13 16:07:33,260 INFO  [io.quarkus] (main) Profile prod activated.
+    2024-12-13 16:07:33,260 INFO  [io.quarkus] (main) Installed features: [agroal, cdi, hibernate-orm, hibernate-orm-panache, hibernate-orm-rest-data-panache, jdbc-postgresql, narayana-jta, rest, rest-jackson, rest-links, smallrye-context-propagation, smallrye-health, smallrye-openapi, swagger-ui, vertx]
     ~~~
 
 4. With the app running we can add a book to the library service. In a different terminal run the following command:
@@ -523,9 +541,10 @@ More information around building a native executable can be found in the [offici
 
     ~~~output
     [INFO] [io.quarkus.deployment.util.ExecUtil] COMMIT rha/library-shop-docker-native:1.0.0
-    [INFO] [io.quarkus.deployment.util.ExecUtil] --> 0877361cdb46
+    [INFO] [io.quarkus.deployment.util.ExecUtil] --> 1354f4b0a7f0
     [INFO] [io.quarkus.deployment.util.ExecUtil] Successfully tagged localhost/rha/library-shop-docker-native:1.0.0
-    [INFO] [io.quarkus.deployment.util.ExecUtil] 0877361cdb4610839031d82e42482647fe8761774aff3f2f67832b906414f76d
+    [INFO] [io.quarkus.deployment.util.ExecUtil] Successfully tagged localhost/rha/library-shop-native:1.0.0
+    [INFO] [io.quarkus.deployment.util.ExecUtil] 1354f4b0a7f03dd3061a1df33dd62f80803672de3d90ac1d4cf308a31a9b6415
     [INFO] [io.quarkus.container.image.docker.deployment.DockerProcessor] Built container image rha/library-shop-docker-native:1.0.0
     ~~~
 
@@ -541,27 +560,38 @@ More information around building a native executable can be found in the [offici
     ~~~output
     ...
     [WARNING] [io.quarkus.container.image.jib.deployment.JibProcessor] Base image 'quay.io/quarkus/quarkus-micro-image:2.0' does not use a specific image digest - build may not be reproducible
-    [INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Using base image with digest: sha256:77a3524aca02a5875979ecfe06bb283af2960ed922264ceadd97865077e7b087
+    [INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Using base image with digest: sha256:0c20f8846bacc99824f376e8567d5a98434d1a34996dd47c3b3421bbea21fa40
     [INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Container entrypoint set to [./application]
-    [INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Created container image rha/library-shop-jib-native:1.0.0 (sha256:909d34b44768def9b940a771a4048c454c3a6457ebe139b9b098809996359c3a)
+    [INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Created container image rha/library-shop-jib-native:1.0.0 (sha256:4ebd636c42c2b70ce39a12dc508c5ed64eeee8e4e955a8b08e0a915727031b89)
     ~~~
 
 ### Comparing the different container images in size
 
 During this lab we have built several container images, we will see how the one using the native binaries have a smaller footprint than the others.
 
+1. Check the comparisson between the sizes of the container images.
 
-~~~sh
-podman images | grep -i library-shop
-~~~
+    ~~~sh
+    podman images | grep -i library-shop
+    ~~~
 
-~~~output
-localhost/rha/library-shop-jib-native               1.0.0       99074fdb7384  3 days ago     123 MB
-localhost/rha/library-shop-native                   1.0.0       dec4939a705f  3 days ago     187 MB
-localhost/rha/library-shop-docker-native            1.0.0       dec4939a705f  3 days ago     187 MB
-localhost/rha/library-shop-docker                   1.0.0       5b0dd26b635c  3 days ago     406 MB
-localhost/rha/library-shop-jib                      1.0.0       b15f3e3b6ab0  3 days ago     406 MB
-localhost/rha/library-shop                          1.0.0       5c8c31912a20  3 days ago     406 MB
-~~~
+    ~~~output
+    localhost/rha/library-shop-jib-native               1.0.0           346c620e26de  42 seconds ago  128 MB
+    localhost/rha/library-shop-docker-native            1.0.0           1354f4b0a7f0  7 minutes ago   203 MB
+    localhost/rha/library-shop-native                   1.0.0           1354f4b0a7f0  7 minutes ago   203 MB
+    localhost/rha/library-shop-docker                   1.0.0           8041fd1c34a1  32 minutes ago  421 MB
+    localhost/rha/library-shop-jib                      1.0.0           da33481d0656  36 minutes ago  422 MB
+    localhost/rha/library-shop                          1.0.0           a88470feeb9f  56 minutes ago  421 MB
+    ~~~
 
 As we can see, the natives ones are ~200MB smaller. This will lead to less storage utilization and also to faster startup times since the image will be pulled faster.
+
+
+### Clean up
+
+1. Remove created containers
+
+    ~~~sh
+    podman stop pg-library-shop
+    podman network rm rhademo
+    ~~~
