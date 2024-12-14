@@ -4,7 +4,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
 ## Lab 1 - Deploy *as a Developer* the Quarkus application
 
-1. Connect to the Fedora 39 system.
+1. Connect to the Fedora 41 system.
 
 2. You should already have the `Visual Studio Code` application opened, if not, go ahead an open it.
 
@@ -21,7 +21,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
 6. Login into OpenShift:
 
-    1. Access the [OpenShift Console URL](https://red.ht/ieselgrao
+    1. Access the [OpenShift Console URL](https://red.ht/ieselgrao)
     2. Login using the credentials shared during the session).
     3. If you get a prompt for a console tour press `Skip Tour`.
     4. Click on your username in the top right corner and click `Copy login command`.
@@ -35,6 +35,9 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
     ~~~sh
     export STUDENT=student<your_student_number>
+    ~~~
+
+    ~~~sh
     oc new-project $STUDENT-dev
     ~~~
 
@@ -56,6 +59,30 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
         oc apply -f https://github.com/juazugas/intro-to-quarkus-containers-ocp/raw/main/demo2-assets/openshift/dev/database.deployment.yaml
         ~~~
 
+    3. Check the resources
+
+        ~~~sh
+        oc status
+        ~~~
+
+        ~~~output
+        In project studentXX-dev on server https://...:6443
+
+        svc/library-db - 172.30.129.198:5432
+        deployment/library-db deploys openshift/postgresql:15-el8
+            deployment #2 running for 2 minutes - 1 pod
+            deployment #1 deployed 2 minutes ago
+        ~~~
+
+        ~~~sh
+        oc get pods
+        ~~~
+
+        ~~~output
+        NAME                          READY   STATUS    RESTARTS   AGE
+        library-db-84695c98f7-wjn24   1/1     Running   0          3m40s
+        ~~~~
+
 9. Launch the build for the application in OpenShift
 
     ~~~sh
@@ -63,6 +90,9 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     ~~~
 
     ~~~output
+    [INFO] oc: Creating BuildServiceConfig library-shop-s2i for Source build
+    [INFO] oc: Creating ImageStream library-shop
+    [INFO] oc: Starting Build library-shop-s2i
     ...
     [INFO] oc: Build library-shop-s2i-1 in status Complete
     [INFO] oc: Found tag on ImageStream library-shop tag: sha256:60da633a...
@@ -76,9 +106,9 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
         ~~~
 
         ~~~output
-        bc/library-shop-s2i source builds uploaded code on quay.io/jkube/jkube-java:0.0.20
+        bc/library-shop-s2i source builds uploaded code on quay.io/quarkus/ubi-quarkus-native-binary-s2i:1.0
         -> istag/library-shop:1.0.0
-        build #1 succeeded 38 seconds ago
+        build #1 succeeded 42 seconds ago
         ~~~
 
         ~~~sh
@@ -97,7 +127,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     ~~~
 
     ~~~output
-    [INFO] --- oc:1.15.0:apply (default-cli) @ library-shop ---
+    [INFO] --- oc:1.17.0:apply (default-cli) @ library-shop ---
     [INFO] oc: OpenShift platform detected
     [INFO] oc: Using OpenShift at https://...:6443/ in namespace null with manifest target/classes/META-INF/jkube/openshift.yml
     [INFO] oc: Creating a Secret in student1--dev namespace with name library-shop from openshift.yml
