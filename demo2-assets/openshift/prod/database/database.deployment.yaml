@@ -41,13 +41,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"postgresql:15-el8","namespace":"openshift"},"fieldPath":"spec.template.spec.containers[?(@.name==\"postgresql\")].image"}]'
+    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"postgresql:15-el9","namespace":"openshift"},"fieldPath":"spec.template.spec.containers[?(@.name==\"postgresql\")].image"}]'
   labels:
     app.kubernetes.io/part-of: rhacademy
     app.kubernetes.io/component: database
     app.kubernetes.io/instance: library-shop-db
     app.kubernetes.io/name: postgresql
-    app.kubernetes.io/version: "15-el8"
+    app.kubernetes.io/version: "15-el9"
     app: library-shop-db
   name: library-db
 spec:
@@ -83,7 +83,7 @@ spec:
                 secretKeyRef:
                   key: DATABASE_NAME
                   name: library-db
-          image: image-registry.openshift-image-registry.svc:5000/openshift/postgresql@sha256:289a28c4dd16b418a53ba0e3a38bceaaaee60bc28f7aeae69cacf0c57738b374
+          image: image-registry.openshift-image-registry.svc:5000/openshift/postgresql@sha256:8910bd59fcf917fc54f47342939ca3f828560f1881245ed3777ace21e0367963
           imagePullPolicy: IfNotPresent
           lifecycle:
             postStart:

@@ -6,9 +6,10 @@ nsPreffix=${STUDET_NS:-student}
 
 OC="oc"
 
-for i in $(seq "${numStudents}"); do 
+for i in $(seq "${numStudents}"); do
   echo "Preparing environment for student $i"
   namespace="${nsPreffix}${i}"
+
   $OC annotate --overwrite namespace/${namespace} 'operator.tekton.dev/prune.keep=2'
   $OC annotate --overwrite namespace/${namespace} 'operator.tekton.dev/prune.schedule=* * * * *'
 
