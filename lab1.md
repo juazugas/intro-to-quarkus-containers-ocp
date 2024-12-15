@@ -189,6 +189,10 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     2024-12-13 15:11:57,415 INFO  [io.quarkus] (main) library-shop stopped in 0.036s
     ~~~
 
+10. Want more?
+
+    > :bulb: **Note:** Complete the [bonus lab](lab-bonus.md).
+
 ## Lab 3 - Building the container image
 
 ### Build container image manually
@@ -365,7 +369,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     > :bulb: **Note:**
     >
     > It may take some minutes to compile, we added`-Dquarkus.native.builder-image.pull=never` to avoid pulling the mandrel container image again.
-    > 
+    >
     > For detailed information and explanations on the build output, visit [the docs](https://github.com/oracle/graal/blob/master/docs/reference-manual/native-image/BuildOutput.md).
 
     ~~~sh
