@@ -21,17 +21,18 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
 6. Login into OpenShift:
 
-    1. Access the [OpenShift Console URL](https://red.ht/ieselgrao)
-    2. Login using the credentials shared during the session).
+    1. Access the [OpenShift Console URL](https://red.ht/ieselgrao).
+    2. Log in using the credentials shared during the session.
     3. If you get a prompt for a console tour press `Skip Tour`.
     4. Click on your username in the top right corner and click `Copy login command`.
-    5. In the next screen you may need to login again, once logged in, press `Display Token`.
-    6. Copy the command under `Log in with this token`. i.e: `oc login --token=sha256~... --server=https://api.rha.example.com:6443`.
+    5. In the next screen you may need to log in again, once logged in, press `Display Token`.
+    6. Copy the command under `Log in with this token`.
+       i.e: `oc login --token=sha256~... --server=https://api.rha.example.com:6443`.
     7. Paste the command in the terminal.
 
 7. Create a development namespace in OpenShift:
 
-    > **NOTE**: Change the username in the command below with the username assigned to you.
+   > :bulb: **Note:** Change the username in the command below with the username assigned to you:
 
     ~~~sh
     export STUDENT=student<your_student_number>
@@ -47,19 +48,19 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
 8. Deploy the database:
 
-    1. Create the secret with the DDL
+    1. Create the secret with the DDL:
 
         ~~~sh
         oc apply -f https://github.com/juazugas/intro-to-quarkus-containers-ocp/raw/main/demo2-assets/openshift/dev/database.ddl.yaml
         ~~~
 
-    2. Apply the resources for the deployment
+    2. Apply the resources for the deployment:
 
         ~~~sh
         oc apply -f https://github.com/juazugas/intro-to-quarkus-containers-ocp/raw/main/demo2-assets/openshift/dev/database.deployment.yaml
         ~~~
 
-    3. Check the resources
+    3. Check the resources:
 
         ~~~sh
         oc status
@@ -83,7 +84,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
         library-db-84695c98f7-wjn24   1/1     Running   0          3m40s
         ~~~~
 
-9. Launch the build for the application in OpenShift
+9. Launch the build for the application in OpenShift:
 
     ~~~sh
     ./mvnw oc:build
@@ -99,7 +100,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     [INFO] oc: ImageStream library-shop written to .../library-shop/target/library-shop-is.yml
     ~~~
 
-    1. Check the generated elements
+    1. Check the generated elements:
 
         ~~~sh
         oc status
@@ -157,15 +158,15 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
     2. Type `Ctrl+C` to exit from the watch.
 
-11. Check the application is working correctly
+11. Check the application is working correctly:
 
-    1. Get the generated route host
+    1. Get the generated route host:
 
         ~~~sh
         APP_ROUTE=$(oc get route library-shop --template='{{ .spec.host }}')
         ~~~
 
-    2. Request the application data
+    2. Request the application data:
 
         ~~~sh
         curl -k -s https://${APP_ROUTE}/ehlo
@@ -205,7 +206,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
 2. Click on `library-shop` in the right section, under `Your repositories`.
 
-3. Keep this repository opened since we will be using it later on.
+3. Keep this repository open since we will be using it later on.
 
 4. Back in the terminal, change to the production namespace:
 
@@ -228,7 +229,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
     library-shop-pipeline   35m   app=library-shop-pipelines,group=rhacademy
     ~~~
 
-    Check the OpenShift console for a visual representation of the pipeline
+    Check the OpenShift console for a visual representation of the pipeline:
 
     1. Access the [console url](https://red.ht/ieselgrao) from your browser.
     2. Make sure the left menu top option is set to `Developer` and click `Pipelines` in this same menu.
@@ -237,7 +238,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
 6. Execute the pipeline:
 
-    1. Via CLI
+    1. Via CLI:
 
         ~~~sh
         tkn pipeline start library-shop-pipeline \

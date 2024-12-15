@@ -27,7 +27,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 
 7. Eventually, you will get this in your screen:
 
-    > **NOTE**: At this point the application is running.
+    > :bulb: **Note:** At this point the application is running.
 
     ~~~console
     2024-12-13 12:00:14,288 INFO  [io.quarkus] (Quarkus Main Thread) library-shop 1.0.0 on JVM (powered by Quarkus 3.17.2) started in 20.200s. Listening on: http://localhost:8080
@@ -64,7 +64,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     (3 rows)
     ~~~
 
-11. Query and check the application is running
+11. Query and check the application is running:
 
     ~~~sh
     curl -s http://localhost:8080/hello
@@ -92,7 +92,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 
 ## Lab 2 - Developing the application
 
-1. Open the GreetingResource.java (src/main/java), change the return message to `Hello Red Hat Academy` and save the changes.
+1. Open the `GreetingResource.java` (`src/main/java`), change the return message to `Hello Red Hat Academy` and save the changes.
 
     ~~~java
     public String hello() {
@@ -100,7 +100,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     }
     ~~~
 
-2. In the terminal, check that the application has the new changes(It's been rebuilt and restarted):
+2. In the terminal, check that the application has the new changes (It's been rebuilt and restarted):
 
     ~~~sh
     curl -s http://localhost:8080/hello
@@ -110,7 +110,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     Hello Red Hat Academy
     ~~~
 
-3. Fix the test GreetingsResourceTest.java (src/test/java), save the changes and launch the test suite.
+3. Fix the test `GreetingsResourceTest.java` (`src/test/java`), save the changes and launch the test suite.
 
     ~~~java
     @Test
@@ -120,6 +120,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
           .then()
              .statusCode(200)
              .body(is("Hello Red Hat Academy"));
+    }
     ~~~
 
     ~~~sh
@@ -144,9 +145,9 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     ./mvnw package
     ~~~
 
-    Check the target directory and verify the generated jar and the dependencies
+    Check the target directory and verify the generated jar and the dependencies.
 
-5. (optional) Validate the application code
+5. (optional) Validate the application code:
 
     ~~~sh
     ./mvnw validate
@@ -192,7 +193,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 
 ### Build container image manually
 
-1. Check the file Containerfile.jvm (src/main/docker).
+1. Check the file `Containerfile.jvm` (`src/main/docker`).
 
 2. In the terminal execute the build command in the application directory:
 
@@ -203,7 +204,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 
 3. Inspect the created image:
 
-    > **NOTE**: We can see the different layers, commands used, etc.
+   > :bulb: **Note:** We can see the different layers, commands used, etc.
 
     ~~~sh
     podman inspect rha/library-shop:1.0.0
@@ -252,7 +253,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     ehlo from version v1 host localhost
     ~~~
 
-6. Stop the container with `Ctrl + c` on the terminal
+6. Stop the container with `Ctrl + c` on the terminal:
 
     ~~~sh
     podman stop library-shop-app
@@ -260,7 +261,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 
 ### Build the container image using Quarkus Jib Extension
 
-1. In one of the terminals, change into the application directory and run the build command
+1. In one of the terminals, change into the application directory and run the build command:
 
     ~~~sh
     cd ~/library-shop/
@@ -302,7 +303,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 
 ### Build the container image using Quarkus Docker Extension
 
-1. In one of the terminals, change into the application directory and run the build command
+1. In one of the terminals, change into the application directory and run the build command:
 
     ~~~sh
     cd ~/library-shop/
@@ -345,7 +346,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     podman stop library-shop-app
     ~~~
 
-5. Compare the generated image with the generated manually running the podman command
+5. Compare the generated image with the generated manually running the podman command:
 
     ~~~sh
     podman images | grep -i library-shop
@@ -361,14 +362,18 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 
 1. In one of the terminals, execute the command to compile to native:
 
-    > **NOTE**: it may take some minutes to compile, we added`-Dquarkus.native.builder-image.pull=never` to avoid pulling the mandrel container image again. For detailed information and explanations on the build output, visit [the docs](https://github.com/oracle/graal/blob/master/docs/reference-manual/native-image/BuildOutput.md).
+    > :bulb: **Note:**
+    >
+    > It may take some minutes to compile, we added`-Dquarkus.native.builder-image.pull=never` to avoid pulling the mandrel container image again.
+    > 
+    > For detailed information and explanations on the build output, visit [the docs](https://github.com/oracle/graal/blob/master/docs/reference-manual/native-image/BuildOutput.md).
 
     ~~~sh
     cd ~/library-shop
     ./mvnw package -Dnative -Dquarkus.native.builder-image.pull=never -Dquarkus.native.container-build=true -Dquarkus.native.container-runtime=podman
     ~~~
 
-    > **NOTE**: This step may take up to 5 minutes to finish.
+    > :bulb: **Note:** This step may take up to 5 minutes to finish.
 
     ~~~output
     [INFO] [io.quarkus.deployment.pkg.steps.NativeImageBuildStep] Running Quarkus native-image plugin on MANDREL 23.1.5.0 JDK 21.0.5+11-LTS
@@ -459,7 +464,7 @@ In the next section we will build the application in native binary format.
 
 ### Building the native application container image manually
 
-1. Check the file Containerfile.native (src/main/docker)
+1. Check the file `Containerfile.native` (`src/main/docker`)
 
 2. Run the podman command to build the native image
 
@@ -477,7 +482,7 @@ In the next section we will build the application in native binary format.
     dec4939a705f3f07a70c0ff1f8ae08489997f040a995471192ece25e2df3e19b
     ~~~
 
-3. Run the container image and verify the app is running correctly
+3. Run the container image and verify the app is running correctly:
 
     ~~~sh
     podman run --net rhademo --name library-shop-app --rm -d -e DATABASE_HOST=pg-library-shop -p 8080:8080 rha/library-shop-native:1.0.0 && \
@@ -569,7 +574,7 @@ More information around building a native executable can be found in the [offici
 
 During this lab we have built several container images, we will see how the one using the native binaries have a smaller footprint than the others.
 
-1. Check the comparisson between the sizes of the container images.
+1. Check the comparison between the sizes of the container images.
 
     ~~~sh
     podman images | grep -i library-shop
@@ -587,9 +592,9 @@ During this lab we have built several container images, we will see how the one 
 As we can see, the natives ones are ~200MB smaller. This will lead to less storage utilization and also to faster startup times since the image will be pulled faster.
 
 
-### Clean up
+### Cleaning up
 
-1. Remove created containers
+1. Remove created containers:
 
     ~~~sh
     podman stop pg-library-shop
