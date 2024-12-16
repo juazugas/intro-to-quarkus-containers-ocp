@@ -38,10 +38,10 @@ spec:
         name: library-shop-pipeline
       params:
       - name: deployment-name
-        value: $(tt.params.git-repo-name)
+        value: library-shop
       - name: git-url
         value: $(tt.params.git-repo-url)
       - name: git-revision
         value: $(tt.params.git-revision)
       - name: backend-image
-        value: image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/$(tt.params.git-repo-name):1.0.0
+        value: image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/library-shop:1.0.0
