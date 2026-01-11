@@ -43,7 +43,7 @@ spec:
         - name: name
           value: git-clone
         - name: namespace
-          value: openshift-pipelines
+          value: rhademo-pipelines
     workspaces:
       - name: output
         workspace: shared-workspace
@@ -101,7 +101,7 @@ spec:
         - name: namespace
           value: openshift-pipelines
     workspaces:
-      - name: manifest-dir
+      - name: manifest_dir
         workspace: shared-workspace
   - name: maven-build
     params:
@@ -123,7 +123,7 @@ spec:
         - name: name
           value: maven
         - name: namespace
-          value: openshift-pipelines
+          value: rhademo-pipelines
     workspaces:
       - name: source
         workspace: shared-workspace

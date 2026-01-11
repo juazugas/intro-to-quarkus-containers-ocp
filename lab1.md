@@ -87,7 +87,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     ~~~
 
     ~~~output
-    ehlo from PostgreSQL 17.2 (Debian 17.2-1.pgdg120+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14) 12.2.0, 64-bit
+    ehlo from PostgreSQL 17.7 (Debian 17.7-3.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
     ~~~
 
 ## Lab 2 - Developing the application
@@ -311,16 +311,13 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 
     ~~~sh
     cd ~/library-shop/
-    ./mvnw package -Pdocker
+    ./mvnw package -Ppodman
     ~~~
 
     ~~~output
     ...
-    [INFO] [io.quarkus.deployment.util.ExecUtil] COMMIT rha/library-shop-docker:1.0.0
-    [INFO] [io.quarkus.deployment.util.ExecUtil] --> 8041fd1c34a1
-    [INFO] [io.quarkus.deployment.util.ExecUtil] Successfully tagged localhost/rha/library-shop-docker:1.0.0
-    [INFO] [io.quarkus.deployment.util.ExecUtil] 8041fd1c34a19c00ea783bca1cc5a68cf0cb971ea84033c9f936d845596eaa6a
-    [INFO] [io.quarkus.container.image.docker.deployment.DockerProcessor] Built container image rha/library-shop-docker:1.0.0
+    [INFO] [io.quarkus.container.image.docker.common.deployment.CommonProcessor] Starting (local) container image build for jar using podman
+    [INFO] [io.quarkus.container.image.docker.common.deployment.CommonProcessor] Executing the following command to build image: 'podman build -f /home/student/library-shop/src/main/docker/Containerfile.jvm -t rha/library-shop-podman:1.0.0 /home/student/library-shop'
 
     [INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 7240ms
     [INFO] ------------------------------------------------------------------------
@@ -380,8 +377,8 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     > :bulb: **Note:** This step may take up to 5 minutes to finish.
 
     ~~~output
-    [INFO] [io.quarkus.deployment.pkg.steps.NativeImageBuildStep] Running Quarkus native-image plugin on MANDREL 23.1.5.0 JDK 21.0.5+11-LTS
-    [INFO] [io.quarkus.deployment.pkg.steps.NativeImageBuildRunner] podman run --env LANG=C --rm --user 1000:1000 --userns=keep-id -v /home/fedora/library-shop/target/library-shop-1.0.0-native-image-source-jar:/project:z --name build-native-ShcBl quay.io/quarkus/ubi-quarkus-mandrel-builder-image:jdk-21 -J-DCoordinatorEnvironmentBean.transactionStatusManagerEnable=false -J-Dsun.nio.ch.maxUpdateArraySize=100 -J-Djava.util.logging.manager=org.jboss.logmanager.LogManager -J-Duser.language=en -J-Duser.country=US -J-Dlogging.initial-configurator.min-level=500 -J-Dvertx.logger-delegate-factory-class-name=io.quarkus.vertx.core.runtime.VertxLogDelegateFactory -J-Dvertx.disableDnsResolver=true -J-Dio.netty.leakDetection.level=DISABLED -J-Dio.netty.allocator.maxOrder=3 -H:+UnlockExperimentalVMOptions -H:IncludeLocales=en-US -H:-UnlockExperimentalVMOptions -J-Dfile.encoding=UTF-8 --features=io.quarkus.caffeine.runtime.graal.CacheConstructorsFeature,io.quarkus.jdbc.postgresql.runtime.graal.SQLXMLFeature,io.quarkus.runner.Feature,io.quarkus.runtime.graal.DisableLoggingFeature,io.quarkus.hibernate.orm.runtime.graal.DisableLoggingFeature,org.hibernate.graalvm.internal.GraalVMStaticFeature -J--add-exports=java.security.jgss/sun.security.krb5=ALL-UNNAMED -J--add-exports=java.security.jgss/sun.security.jgss=ALL-UNNAMED -J--add-opens=java.base/java.text=ALL-UNNAMED -J--add-opens=java.base/java.io=ALL-UNNAMED -J--add-opens=java.base/java.lang.invoke=ALL-UNNAMED -J--add-opens=java.base/java.util=ALL-UNNAMED -H:+UnlockExperimentalVMOptions -H:BuildOutputJSONFile=library-shop-1.0.0-runner-build-output-stats.json -H:-UnlockExperimentalVMOptions -H:+UnlockExperimentalVMOptions -H:+GenerateBuildArtifactsFile -H:-UnlockExperimentalVMOptions --strict-image-heap -H:+UnlockExperimentalVMOptions -H:+AllowFoldMethods -H:-UnlockExperimentalVMOptions -J-Djava.awt.headless=true --no-fallback --link-at-build-time -H:+UnlockExperimentalVMOptions -H:+ReportExceptionStackTraces -H:-UnlockExperimentalVMOptions -H:-AddAllCharsets --enable-url-protocols=http,https --enable-monitoring=heapdump -H:+UnlockExperimentalVMOptions -H:-UseServiceLoaderFeature -H:-UnlockExperimentalVMOptions -J--add-exports=org.graalvm.nativeimage/org.graalvm.nativeimage.impl=ALL-UNNAMED --exclude-config io\.netty\.netty-codec /META-INF/native-image/io\.netty/netty-codec/generated/handlers/reflect-config\.json --exclude-config io\.netty\.netty-handler /META-INF/native-image/io\.netty/netty-handler/generated/handlers/reflect-config\.json library-shop-1.0.0-runner -jar library-shop-1.0.0-runner.jar
+    [INFO] [io.quarkus.deployment.pkg.steps.NativeImageBuildStep] Running Quarkus native-image plugin on MANDREL 23.1.9.0 JDK 21.0.9+10-LTS
+    [INFO] [io.quarkus.deployment.pkg.steps.NativeImageBuildRunner] podman run --env LANG=C --rm --user 1000:1000 --userns=keep-id -v /home/student/library-shop/target/library-shop-1.0.0-native-image-source-jar:/project:z --name build-native-iKsRN quay.io/quarkus/ubi9-quarkus-mandrel-builder-image:jdk-21 -J-DCoordinatorEnvironmentBean.transactionStatusManagerEnable=false -J-Dsun.nio.ch.maxUpdateArraySize=100 -J-Djava.util.logging.manager=org.jboss.logmanager.LogManager -J-Duser.language=en -J-Duser.country=US -J-Dlogging.initial-configurator.min-level=500 -J-Dvertx.logger-delegate-factory-class-name=io.quarkus.vertx.core.runtime.VertxLogDelegateFactory -J-Dvertx.disableDnsResolver=true -J-Dio.netty.leakDetection.level=DISABLED -J-Dio.netty.allocator.maxOrder=3 -H:+UnlockExperimentalVMOptions -H:IncludeLocales=en-US -H:-UnlockExperimentalVMOptions -J-Dfile.encoding=UTF-8 -J--add-exports=org.graalvm.nativeimage.builder/com.oracle.svm.core.jdk=ALL-UNNAMED --features=io.quarkus.runner.Feature,io.quarkus.runtime.graal.DisableLoggingFeature,io.quarkus.runtime.graal.JVMChecksFeature,io.quarkus.jdbc.postgresql.runtime.graal.SQLXMLFeature,org.hibernate.graalvm.internal.GraalVMStaticFeature,io.quarkus.hibernate.orm.runtime.graal.RegisterServicesForReflectionFeature,io.quarkus.hibernate.orm.runtime.graal.DisableLoggingFeature,io.quarkus.caffeine.runtime.graal.CacheConstructorsFeature,io.quarkus.runtime.graal.SkipConsoleServiceProvidersFeature -J--add-exports=java.security.jgss/sun.security.krb5=ALL-UNNAMED -J--add-exports=java.security.jgss/sun.security.jgss=ALL-UNNAMED -J--add-opens=java.base/java.text=ALL-UNNAMED -J--add-opens=java.base/java.io=ALL-UNNAMED -J--add-opens=java.base/java.lang.invoke=ALL-UNNAMED -J--add-opens=java.base/java.util=ALL-UNNAMED -H:+UnlockExperimentalVMOptions -H:BuildOutputJSONFile=library-shop-1.0.0-runner-build-output-stats.json -H:-UnlockExperimentalVMOptions -H:+UnlockExperimentalVMOptions -H:+GenerateBuildArtifactsFile -H:-UnlockExperimentalVMOptions --strict-image-heap --install-exit-handlers -H:+UnlockExperimentalVMOptions -H:+AllowFoldMethods -H:-UnlockExperimentalVMOptions -J-Djava.awt.headless=true --no-fallback --link-at-build-time -H:+UnlockExperimentalVMOptions -H:+ReportExceptionStackTraces -H:-UnlockExperimentalVMOptions -H:-AddAllCharsets --enable-url-protocols=http,https --enable-monitoring=heapdump -H:+UnlockExperimentalVMOptions -H:-UseServiceLoaderFeature -H:-UnlockExperimentalVMOptions -J--add-exports=org.graalvm.nativeimage/org.graalvm.nativeimage.impl=ALL-UNNAMED --exclude-config io\.netty\.netty-codec /META-INF/native-image/io\.netty/netty-codec/generated/handlers/reflect-config\.json --exclude-config io\.netty\.netty-handler /META-INF/native-image/io\.netty/netty-handler/generated/handlers/reflect-config\.json library-shop-1.0.0-runner -jar library-shop-1.0.0-runner.jar
     ...
     [3/8] Building universe...
     ...
@@ -545,16 +542,14 @@ More information around building a native executable can be found in the [offici
 
     ~~~sh
     cd ~/library-shop
-    ./mvnw verify -Dnative -Pdocker -Dquarkus.container-image.name=library-shop-docker-native -Dquarkus.native.reuse-existing=true
+    ./mvnw verify -Dnative -Ppodman -Dquarkus.container-image.name=library-shop-docker-native -Dquarkus.native.reuse-existing=true
     ~~~
 
     ~~~output
-    [INFO] [io.quarkus.deployment.util.ExecUtil] COMMIT rha/library-shop-docker-native:1.0.0
-    [INFO] [io.quarkus.deployment.util.ExecUtil] --> 1354f4b0a7f0
-    [INFO] [io.quarkus.deployment.util.ExecUtil] Successfully tagged localhost/rha/library-shop-docker-native:1.0.0
-    [INFO] [io.quarkus.deployment.util.ExecUtil] Successfully tagged localhost/rha/library-shop-native:1.0.0
-    [INFO] [io.quarkus.deployment.util.ExecUtil] 1354f4b0a7f03dd3061a1df33dd62f80803672de3d90ac1d4cf308a31a9b6415
-    [INFO] [io.quarkus.container.image.docker.deployment.DockerProcessor] Built container image rha/library-shop-docker-native:1.0.0
+    [INFO] [io.quarkus.container.image.docker.common.deployment.CommonProcessor] Starting (local) container image build for jar using podman
+    [INFO] [io.quarkus.container.image.docker.common.deployment.CommonProcessor] Executing the following command to build image: 'podman build -f /home/student/library-shop/src/main/docker/Containerfile.native -t rha/library-shop-docker-native:1.0.0 /home/student/library-shop'
+    [INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 3185ms
+
     ~~~
 
 ### Build the image via the Jib Container Extension
@@ -568,7 +563,7 @@ More information around building a native executable can be found in the [offici
 
     ~~~output
     ...
-    [WARNING] [io.quarkus.container.image.jib.deployment.JibProcessor] Base image 'quay.io/quarkus/quarkus-micro-image:2.0' does not use a specific image digest - build may not be reproducible
+    [WARNING] [io.quarkus.container.image.jib.deployment.JibProcessor] Base image 'quay.io/quarkus/ubi9-quarkus-micro-image:2.0' does not use a specific image digest - build may not be reproducible
     [INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Using base image with digest: sha256:0c20f8846bacc99824f376e8567d5a98434d1a34996dd47c3b3421bbea21fa40
     [INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Container entrypoint set to [./application]
     [INFO] [io.quarkus.container.image.jib.deployment.JibProcessor] Created container image rha/library-shop-jib-native:1.0.0 (sha256:4ebd636c42c2b70ce39a12dc508c5ed64eeee8e4e955a8b08e0a915727031b89)
