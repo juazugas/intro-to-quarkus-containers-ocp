@@ -305,7 +305,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     podman stop library-shop-app
     ~~~
 
-### Build the container image using Quarkus Docker Extension
+### Build the container image using Quarkus Podman Extension
 
 1. In one of the terminals, change into the application directory and run the build command:
 
@@ -328,7 +328,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 2. Run the generated container image and check the application runs correctly:
 
     ~~~sh
-    podman run --net rhademo --name library-shop-app --rm -d -e DATABASE_HOST=pg-library-shop -p 8080:8080 rha/library-shop-docker:1.0.0
+    podman run --net rhademo --name library-shop-app --rm -d -e DATABASE_HOST=pg-library-shop -p 8080:8080 rha/library-shop-podman:1.0.0
     ~~~
 
 3. Verify the application runs correctly:
@@ -354,7 +354,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
     ~~~
 
     ~~~output
-    localhost/rha/library-shop-docker                   1.0.0       5b0dd26b635c  2 minutes ago      406 MB
+    localhost/rha/library-shop-podman                   1.0.0       5b0dd26b635c  2 minutes ago      406 MB
     localhost/rha/library-shop-jib                      1.0.0       b15f3e3b6ab0  5 minutes ago      406 MB
     localhost/rha/library-shop                          1.0.0       5c8c31912a20  35 minutes ago      406 MB
     ~~~
@@ -542,12 +542,12 @@ More information around building a native executable can be found in the [offici
 
     ~~~sh
     cd ~/library-shop
-    ./mvnw verify -Dnative -Ppodman -Dquarkus.container-image.name=library-shop-docker-native -Dquarkus.native.reuse-existing=true
+    ./mvnw verify -Dnative -Ppodman -Dquarkus.container-image.name=library-shop-podman-native -Dquarkus.native.reuse-existing=true
     ~~~
 
     ~~~output
     [INFO] [io.quarkus.container.image.docker.common.deployment.CommonProcessor] Starting (local) container image build for jar using podman
-    [INFO] [io.quarkus.container.image.docker.common.deployment.CommonProcessor] Executing the following command to build image: 'podman build -f /home/student/library-shop/src/main/docker/Containerfile.native -t rha/library-shop-docker-native:1.0.0 /home/student/library-shop'
+    [INFO] [io.quarkus.container.image.docker.common.deployment.CommonProcessor] Executing the following command to build image: 'podman build -f /home/student/library-shop/src/main/docker/Containerfile.native -t rha/library-shop-podman-native:1.0.0 /home/student/library-shop'
     [INFO] [io.quarkus.deployment.QuarkusAugmentor] Quarkus augmentation completed in 3185ms
 
     ~~~
@@ -581,9 +581,9 @@ During this lab we have built several container images, we will see how the one 
 
     ~~~output
     localhost/rha/library-shop-jib-native               1.0.0           346c620e26de  42 seconds ago  128 MB
-    localhost/rha/library-shop-docker-native            1.0.0           1354f4b0a7f0  7 minutes ago   203 MB
+    localhost/rha/library-shop-podman-native            1.0.0           1354f4b0a7f0  7 minutes ago   203 MB
     localhost/rha/library-shop-native                   1.0.0           1354f4b0a7f0  7 minutes ago   203 MB
-    localhost/rha/library-shop-docker                   1.0.0           8041fd1c34a1  32 minutes ago  421 MB
+    localhost/rha/library-shop-podman                   1.0.0           8041fd1c34a1  32 minutes ago  421 MB
     localhost/rha/library-shop-jib                      1.0.0           da33481d0656  36 minutes ago  422 MB
     localhost/rha/library-shop                          1.0.0           a88470feeb9f  56 minutes ago  421 MB
     ~~~
