@@ -4,7 +4,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
 ## Lab 1 - Deploy *as a Developer* the Quarkus application
 
-1. Connect to the Fedora 41 system.
+1. Connect to the Fedora 43 system.
 
 2. You should already have the `Visual Studio Code` application opened, if not, go ahead an open it.
 
@@ -16,7 +16,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
     ~~~sh
     cd ~/library-shop/
-    ./mvnw package
+    ./mvnw package -Dnative -Dquarkus.native.builder-image.pull=never -Dquarkus.native.container-build=true -Dquarkus.native.container-runtime=podman -Dquarkus.native.reuse-existing=true
     ~~~
 
 6. Login into OpenShift:
@@ -87,7 +87,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 9. Launch the build for the application in OpenShift:
 
     ~~~sh
-    ./mvnw oc:build
+    ./mvnw oc:build -Djkube.generator.from=quay.io/quarkus/ubi9-quarkus-native-binary-s2i:2.0
     ~~~
 
     ~~~output
@@ -119,6 +119,15 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
         ~~~output
         NAME                       READY   STATUS      RESTARTS   AGE
         library-shop-s2i-1-build   0/1     Completed   0          11m
+        ~~~
+
+        ~~~sh
+        oc get is library-shop
+        ~~~
+
+        ~~~output
+        NAME           IMAGE REPOSITORY                                                              TAGS    UPDATED
+        library-shop   image-registry.openshift-image-registry.svc:5000/student1--dev/library-shop   1.0.0   10 minutes ago
         ~~~
 
 10. Deploy the application:
@@ -181,7 +190,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
         ~~~
 
         ~~~output
-        ehlo from PostgreSQL 15.3 on x86_64-redhat-linux-gnu, compiled by gcc (GCC) 8.5.0 20210514 (Red Hat 8.5.0-18), 64-bit
+        ehlo from PostgreSQL 16.11 on x86_64-redhat-linux-gnu, compiled by gcc (GCC) 14.3.1 20250617 (Red Hat 14.3.1-2), 64-bit
         ~~~
 
         ~~~sh
