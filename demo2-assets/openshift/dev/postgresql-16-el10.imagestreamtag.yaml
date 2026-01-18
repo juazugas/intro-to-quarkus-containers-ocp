@@ -1,0 +1,26 @@
+---
+# oc tag -n openshift registry.redhat.io/rhel10/postgresql-16@sha256:ca3241a3fa3a15a34b8b0f0ba60c8b7d8b706420ef745bc55a641d93e9a3b6a5 postgresql:16-el10
+kind: ImageStreamTag
+apiVersion: image.openshift.io/v1
+metadata:
+  name: postgresql:16-el10
+  namespace: openshift
+  creationTimestamp: null
+tag:
+  name: 16-el10
+  annotations: null
+  from:
+    kind: DockerImage
+    name: registry.redhat.io/rhel10/postgresql-16@sha256:ca3241a3fa3a15a34b8b0f0ba60c8b7d8b706420ef745bc55a641d93e9a3b6a5
+  generation: 0
+  importPolicy:
+    importMode: Legacy
+  referencePolicy:
+    type: Source
+generation: 0
+lookupPolicy:
+  local: false
+image:
+  metadata:
+    creationTimestamp: null
+  dockerImageMetadata: null
