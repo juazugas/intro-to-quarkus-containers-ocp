@@ -13,6 +13,7 @@ In this lab we are going to see how we can use Java with [Quarkus](https://quark
 4. In this terminal, clone the application and change into the created directory:
 
     ~~~sh
+    rm -rf ~/library-shop
     git clone https://github.com/juazugas/rha-quarkus-library-shop.git  ~/library-shop
     cd ~/library-shop/
     ~~~
