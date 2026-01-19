@@ -17,11 +17,10 @@ pipelineTasks="git-clone buildah openshift-client maven"
 $OC project "${pipelinesNs}" || $OC new-project "${pipelinesNs}"
 
 # Install tekton tasks from hub
-for task in $pipelineTasks; do
-  echo "installing task $task in $pipelinesNs"
-  $TKN hub install task "${task}" -n "${pipelinesNs}" || \
-    echo "$task already installed in $pipelinesNs"
-done
+$OC apply -n ${pipelinesNs} -f https://github.com/tektoncd/catalog/raw/main/task/git-clone/0.10/git-clone.yaml
+echo "`git-clone` task already installed in $pipelinesNs"
+$OC apply -n ${pipelinesNs} -f https://github.com/tektoncd/catalog/raw/main/task/maven/0.4/maven.yaml
+echo "`maven` task already installed in $pipelinesNs"
 
 $OC adm policy add-role-to-user view "$studentUser" -n "${pipelinesNs}"
 

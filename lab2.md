@@ -21,13 +21,13 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
 6. Login into OpenShift:
 
-    1. Access the [OpenShift Console URL](https://red.ht/ieselgrao).
+    1. Access the [OpenShift Console URL](https://red.ht/ieselgrao2026).
     2. Log in using the credentials shared during the session.
     3. If you get a prompt for a console tour press `Skip Tour`.
     4. Click on your username in the top right corner and click `Copy login command`.
     5. In the next screen you may need to log in again, once logged in, press `Display Token`.
     6. Copy the command under `Log in with this token`.
-       i.e: `oc login --token=sha256~... --server=https://api.rha.example.com:6443`.
+       i.e: `oc login --token=sha256~... --server=https://api.rha2026.example.com:6443`.
     7. Paste the command in the terminal.
 
 7. Create a development namespace in OpenShift:
@@ -209,9 +209,18 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
         [{"id":1,"title":"The Hitchhiker's Guide to the Galaxy","year":1979,"isbn":"0-330-25864-8","price":10.0,"authors":[{"name":"Douglas Adams"}]},{"id":2,"title":"Snow Crash","year":1992,"isbn":"0-593-59973-X","price":10.0,"authors":[{"name":"Neal Stephenson"}]},{"id":3,"title":"Digital Fortress","year":1998,"isbn":"0-312-18087-X","price":10.0,"authors":[{"name":"Dan Brown"}]}
         ~~~
 
+### Cleaning up
+
+1. Scale down the application:
+
+    ~~~sh
+    oc scale deployment library-shop --replicas=0
+    oc scale deployment library-db --replicas=0
+    ~~~
+
 ## Lab 2 - Deploy *in production* the Quarkus application
 
-1. Access the [Git Server](https://gogs-git-rha.apps.rha.mavazque.sysdeseng.com/) we use for production in your browser and login with the credentials shared during the session.
+1. Access the [Git Server](https://gogs-git-rha.apps.rha2026.mavazque.sysdeseng.com/) we use for production in your browser and login with the credentials shared during the session.
 
 2. Click on `library-shop` in the right section, under `Your repositories`.
 
@@ -240,10 +249,11 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
     Check the OpenShift console for a visual representation of the pipeline:
 
-    1. Access the [console url](https://red.ht/ieselgrao) from your browser.
-    2. Make sure the left menu top option is set to `Developer` and click `Pipelines` in this same menu.
-    3. Click on the `library-shop-pipeline` Pipeline.
-    4. Explore the pipeline details
+    1. Access the [console url](https://red.ht/ieselgrao2026) from your browser.
+    2. Select the project "studentX" (replace X with your student number).
+    3. Make sure the left menu top option is set to `Pipelines` and click `Pipelines` in this same menu.
+    4. Click on the `library-shop-pipeline` Pipeline.
+    5. Explore the pipeline details
 
 6. Execute the pipeline:
 
@@ -255,7 +265,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
             --prefix-name=library-shop-build- \
             --serviceaccount=pipeline \
             -p deployment-name=library-shop \
-            -p git-url=https://gogs-git-rha.apps.rha.mavazque.sysdeseng.com/$STUDENT/library-shop.git \
+            -p git-url=https://gogs-git-rha.apps.rha2026.mavazque.sysdeseng.com/$STUDENT/library-shop.git \
             -p backend-image=image-registry.openshift-image-registry.svc:5000/$STUDENT/library-shop:1.0.0 \
             -l group=rhacademy,app=library-shop \
             --use-param-defaults
@@ -265,7 +275,7 @@ In this lab we are going to see how we can use Java with Quarkus to build and ru
 
 8. In this section we are going to make a change into our repository, and we will see how the pipeline gets executed automatically.
 
-    1. Access your git repository in the [Git Server](https://gogs-git-rha.apps.rha.mavazque.sysdeseng.com/).
+    1. Access your git repository in the [Git Server](https://gogs-git-rha.apps.rha2026.mavazque.sysdeseng.com/).
     2. Click on `README.md`.
     3. Once the file is opened, click on the pencil icon in the right corner.
     4. Make some changes and click on `Commit changes`.
